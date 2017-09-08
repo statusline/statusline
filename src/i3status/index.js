@@ -1,3 +1,5 @@
+const console = require("../console");
+
 const status = {
 	blocks: [],
 	inited: false,
@@ -8,11 +10,11 @@ const status = {
 		if(!status.inited){
 			status.inited = true;
 
-			console.log("{\"version\":1}");
-			console.log("[");
-			console.log(JSON.stringify(output));
+			console.output("{\"version\":1}");
+			console.output("[");
+			console.output(JSON.stringify(output));
 		} else {
-			console.log(",", JSON.stringify(output));
+			console.output(",", JSON.stringify(output));
 		}
 
 	},
