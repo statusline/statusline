@@ -8,8 +8,8 @@ const config = {
 		blocks: [
 			{
 				name: "time",
-				backgroundColor: "#000",
-				color: "#fff"
+				backgroundColor: "#000000",
+				color: "#ffffff"
 			}
 		]
 	},
