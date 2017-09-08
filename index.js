@@ -22,9 +22,11 @@ const commands = {
 	}
 };
 
+
 do {
 	var command = process.argv.shift();
 } while(command != undefined && Object.keys(commands).indexOf(command) === -1);
+
 
 if(!command){
 	console.error("Command not selected. ");

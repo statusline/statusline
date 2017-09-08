@@ -12,7 +12,7 @@ const console = {
 		console.print(consoleOld.error, logSymbols.error, arguments);
 	},
 	normal: function(){
-		if(process.env.SILENT){
+		if(process.env.SILENT == true){
 			return;
 		}
 
@@ -21,9 +21,10 @@ const console = {
 		});
 
 		consoleOld.log.apply(this, newArguments);
-	}
+	},
+	output: consoleOld.log, 
 	print: function(type, sign, argumentsObject){
-		if(process.env.SILENT){
+		if(process.env.SILENT == true){
 			return;
 		}
 
