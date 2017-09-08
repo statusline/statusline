@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/nemanjan00/i3statusjs/issues"
   },
-  "homepage": "https://github.com/nemanjan00/i3statusjs#readme"
+  "homepage": "https://github.com/nemanjan00/i3statusjs#readme",
+  "dependencies": {
+    "log-symbols": "^2.0.0"
+  }
 }
