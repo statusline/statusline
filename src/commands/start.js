@@ -10,7 +10,9 @@ const console = require("../console");
 
 module.exports = function(argv){
 	config.loadConfig().then((config) => {
-		status.addBlock();
+		config.blocks.forEach(function(block){
+			status.addBlock(block);
+		});
 
 		setInterval(() => {
 			status.render();

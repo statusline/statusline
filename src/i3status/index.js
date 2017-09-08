@@ -1,4 +1,5 @@
 const console = require("../console");
+const blocks = require("../blocks");
 
 const status = {
 	blocks: [],
@@ -19,16 +20,20 @@ const status = {
 
 	},
 	renderBlock(block){
+		var result = blocks(block);
+
 		return {
 			"name":"disk_info",
 			"instance":"/home",
 			"markup":"none",
-			"full_text":"   /home 353.0 GiB ",
-			"background": "#222222"
+			"full_text": " "+result.text+" ",
+			"background": block.backgroundColor,
+			"separator": false,
+			"separator_block_width": 0
 		};
 	},
 	addBlock: function(block){
-		status.blocks.push({});
+		status.blocks.push(block);
 	}
 }
 

@@ -7,7 +7,7 @@ const config = {
 	default: {
 		blocks: [
 			{
-				blockName: "time",
+				name: "time",
 				backgroundColor: "#000",
 				color: "#fff"
 			}
