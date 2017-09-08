@@ -1,0 +1,25 @@
+{
+  "name": "i3statusjs",
+  "version": "0.0.1",
+  "description": "i3status implementation in Node.JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nemanjan00/i3statusjs.git"
+  },
+  "keywords": [
+    "i3status",
+    "node.js",
+    "i3wm",
+    "i3-wm"
+  ],
+  "author": "nemanjan00",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nemanjan00/i3statusjs/issues"
+  },
+  "homepage": "https://github.com/nemanjan00/i3statusjs#readme"
+}
