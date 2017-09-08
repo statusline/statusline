@@ -21,7 +21,7 @@ fs.access(configFile, (err) => {
 
 		return;
 	} else {
-		fs.writeFile(configFile, JSON.stringify(defaultConfig), (err, fd) => {
+		fs.writeFile(configFile, JSON.stringify(defaultConfig, null, 2), (err, fd) => {
 			if (err) throw err;
 
 			log("Loading default config");
