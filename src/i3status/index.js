@@ -27,6 +27,7 @@ const status = {
 			"instance":"/home",
 			"markup":"none",
 			"full_text": " "+result.text+" ",
+			"color": block.color,
 			"background": block.backgroundColor,
 			"separator": false,
 			"separator_block_width": 0
