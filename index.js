@@ -1,17 +1,33 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const path = require("path");
+
 const status = require("./i3status");
 
-fs.access('myfile', (err) => {
-	if (!err) {
-		return;
-	}
+const homeDir = process.env["HOME"];
 
-	fs.open('myfile', 'wx', (err, fd) => {
-		if (err) throw err;
-		writeMyData(fd);
-	});
+const configFile = path.join(homeDir, ".i3statusjs.conf");
+const logFile = path.join(homeDir, ".i3statusjs.log");
+
+const log = function(line){
+	fs.appendFile(logFile, line+"\n", (err) => {});
+}
+
+fs.access(configFile, (err) => {
+	if (!err) {
+		log("Loading existing config");
+
+		return;
+	} else {
+		fs.open(configFile, 'wx', (err, fd) => {
+			if (err) throw err;
+
+			fs.close(fd, () => {
+				log("Loading default config");
+			});
+		});
+	}
 });
 
 status.addBlock();
