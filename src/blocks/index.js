@@ -29,7 +29,7 @@ module.exports = function(block){
 					}
 
 					resolve({
-						text: "Battery left: "+percentage
+						text: "Battery left: "+percentage+"%"
 					});
 				});
 			});
