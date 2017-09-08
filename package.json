@@ -1,6 +1,6 @@
 {
   "name": "i3statusjs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "i3status implementation in Node.JS",
   "main": "index.js",
   "scripts": {
