@@ -1,3 +1,8 @@
+const paths = require("../paths");
+const fs = require('fs');
+
+const console = require("../console");
+
 const config = {
 	default: {
 		blocks: [
@@ -11,16 +16,16 @@ const config = {
 
 	loadConfig: function(){
 		return new Promise((resolve, reject) => {
-			config.exists.then((exists) => {
+			config.exists().then((exists) => {
 				if(exists){
-					config.load().then(function(config){
+					config.loadConfigFile().then(function(config){
 						resolve(config);
 					});
 				} else {
 					resolve(config.default);
 
-					config.writeConfig(config.default).then(() => {
-						console.log("Written default config");
+					config.writeConfigFile(config.default).then(() => {
+						console.success("Written default config");
 					})
 				}
 			});
@@ -28,7 +33,37 @@ const config = {
 	},
 
 	exists: () => {
-		
+		return new Promise((resolve, reject) => {
+			fs.access(paths.configFile, (err) => {
+				if (!err) {
+					resolve(true);
+				} else {
+					resolve(false);
+				}
+			});
+		});
+	},
+	writeConfigFile: (config) => {
+		return new Promise((resolve, reject) => {
+			fs.writeFile(paths.configFile, JSON.stringify(config, null, 2), (err, fd) => {
+				if (err){
+					reject(err);
+				}
+
+				resolve();
+			});
+		});
+	},
+	loadConfigFile: (config) => {
+		return new Promise((resolve, reject) => {
+			fs.readFile(paths.configFile, (err, data) => {
+				if (err){
+					reject(err);
+				}
+
+				resolve(JSON.parse(data));
+			});
+		});
 	}
 };
 

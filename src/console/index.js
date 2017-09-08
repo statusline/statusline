@@ -11,8 +11,22 @@ const console = {
 	error: function(){
 		console.print(consoleOld.error, logSymbols.error, arguments);
 	},
-	normal: consoleOld.log,
+	normal: function(){
+		if(process.env.SILENT){
+			return;
+		}
+
+		var newArguments = Object.keys(arguments).map((key) => {
+			return arguments[key];
+		});
+
+		consoleOld.log.apply(this, newArguments);
+	}
 	print: function(type, sign, argumentsObject){
+		if(process.env.SILENT){
+			return;
+		}
+
 		let arguments = argumentsObject;
 
 		var newArguments = Object.keys(arguments).map((key) => {

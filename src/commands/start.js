@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
+process.env.SILENT = true;
+
 const fs = require('fs');
-const path = require("path");
 
 const status = require("../i3status");
 const config = require("../config");
