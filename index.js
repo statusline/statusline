@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require("path");
 
 const status = require("./i3status");
+const defaultConfig = require("./defaultConfig");
 
 const homeDir = process.env["HOME"];
 
@@ -20,12 +21,10 @@ fs.access(configFile, (err) => {
 
 		return;
 	} else {
-		fs.open(configFile, 'wx', (err, fd) => {
+		fs.writeFile(configFile, JSON.stringify(defaultConfig), (err, fd) => {
 			if (err) throw err;
 
-			fs.close(fd, () => {
-				log("Loading default config");
-			});
+			log("Loading default config");
 		});
 	}
 });
