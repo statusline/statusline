@@ -1,4 +1,14 @@
 const config = {
+	default: {
+		blocks: [
+			{
+				blockName: "time",
+				backgroundColor: "#000",
+				color: "#fff"
+			}
+		]
+	},
+
 	loadConfig: function(){
 		return new Promise((resolve, reject) => {
 			config.exists.then((exists) => {
@@ -16,6 +26,7 @@ const config = {
 			});
 		});
 	},
+
 	exists: () => {
 		
 	}

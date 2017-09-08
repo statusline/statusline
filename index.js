@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require("path");
 
-const status = require("./i3status");
-const defaultConfig = require("./defaultConfig");
+const status = require("./src/i3status");
+const config = require("./src/config");
 const paths = require("./src/paths");
 
 const log = function(line){
@@ -17,7 +17,7 @@ fs.access(paths.configFile, (err) => {
 
 		return;
 	} else {
-		fs.writeFile(paths.configFile, JSON.stringify(defaultConfig, null, 2), (err, fd) => {
+		fs.writeFile(paths.configFile, JSON.stringify(config.default, null, 2), (err, fd) => {
 			if (err) throw err;
 
 			log("Loading default config");
