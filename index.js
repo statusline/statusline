@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const cli = require("./src/cli");
 const console = require("./src/console");
 
 const commands = {
@@ -22,16 +23,5 @@ const commands = {
 	}
 };
 
-
-do {
-	var command = process.argv.shift();
-} while(command != undefined && Object.keys(commands).indexOf(command) === -1);
-
-
-if(!command){
-	console.error("Command not selected. ");
-	command = "help";
-}
-
-commands[command].run(process.argv)
+cli(commands);
 

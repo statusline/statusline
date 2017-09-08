@@ -1,3 +1,5 @@
+const console = require("../console");
+
 const status = {
 	blocks: [],
 	inited: false,
