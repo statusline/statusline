@@ -4,9 +4,7 @@ const console = require("./src/console");
 
 const commands = {
 	"start": {
-		run: function(){
-		
-		},
+		run: require("./src/commands/start"),
 		description: "i3status application"
 	},
 	"help": {
@@ -33,5 +31,5 @@ if(!command){
 	command = "help";
 }
 
-commands[command].run()
+commands[command].run(process.argv)
 
