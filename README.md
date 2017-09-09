@@ -24,12 +24,11 @@ Something like this for now
 {
 	"blocks": [
 		{
-			"block": "disk",
+			"name": "battery",
 			"backgroundColor": "#000",
 			"color": "#fff",
 			"customOptions": {
-				"disk": "/home",
-				"metric": "remainingSpace"
+				"battery": "BAT0"
 			}
 		}
 	],
