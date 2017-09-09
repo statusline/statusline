@@ -24,7 +24,7 @@ Something like this for now
 {
 	"blocks": [
 		{
-			"block: "disk",
+			"block": "disk",
 			"backgroundColor": "#000",
 			"color": "#fff",
 			"customOptions": {
@@ -33,7 +33,7 @@ Something like this for now
 			}
 		}
 	],
-	"middleware: [
+	"middleware": [
 		{
 			"middleware": "powerlineSeparator"
 		}
