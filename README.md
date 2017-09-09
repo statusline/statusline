@@ -1,4 +1,4 @@
-# i3statusjs
+# statusline
 
 This project is in development
 
