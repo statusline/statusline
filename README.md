@@ -20,22 +20,22 @@ I was thinking about giving options object to package function and getting back 
 
 Something like this for now
 
-```js
+```json
 {
-	blocks: [
+	"blocks": [
 		{
-			block: "disk",
-			backgroundColor: "#000",
-			color: "#fff",
-			customOptions: {
-				disk: "/home",
-				metric: "remainingSpace"
+			"block: "disk",
+			"backgroundColor": "#000",
+			"color": "#fff",
+			"customOptions": {
+				"disk": "/home",
+				"metric": "remainingSpace"
 			}
 		}
 	],
-	middleware: [
+	"middleware: [
 		{
-			middleware: "powerlineSeparator"
+			"middleware": "powerlineSeparator"
 		}
 	]
 }
