@@ -27,7 +27,7 @@ const status = {
 					"name":"disk_info",
 					"instance":"/home",
 					"markup":"none",
-					"full_text": " "+result.text+" ",
+					"full_text": result.text,
 					"color": block.color,
 					"background": block.backgroundColor,
 					"separator": false,

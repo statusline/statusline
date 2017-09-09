@@ -1,5 +1,5 @@
 {
-  "name": "i3statusjs",
+  "name": "statusline",
   "version": "0.0.8",
   "description": "i3status implementation in Node.JS",
   "main": "index.js",

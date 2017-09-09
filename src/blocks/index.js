@@ -3,7 +3,14 @@ module.exports = function(block){
 		time: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
-					text: new Date() + ""
+					text: " "+new Date() + " "
+				});
+			});
+		},
+		powerline: function(block){
+			return new Promise((resolve, reject) => {
+				resolve({
+					text: ""
 				});
 			});
 		},
@@ -29,7 +36,7 @@ module.exports = function(block){
 					}
 
 					resolve({
-						text: "Battery left: "+percentage+"%"
+						text: " Battery left: "+percentage+"% "
 					});
 				});
 			});
