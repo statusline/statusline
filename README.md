@@ -20,7 +20,7 @@ I was thinking about giving options object to package function and getting back 
 
 Something like this for now
 
-```json
+```js
 {
 	blocks: [
 		{
