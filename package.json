@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "i3statusjs": "index.js"
+    "statusline": "index.js"
   },
   "repository": {
     "type": "git",
