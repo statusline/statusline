@@ -9,12 +9,12 @@ This project is in development
 ### Installation
 
 ```bash
-npm install -g statusline
+sudo npm install -g statusline
 ```
 
 ### Using within i3bar
 
-In `~/.i3/config` find `status\_command` and set it to `statusline i3status`.
+In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 ## Features 
 
