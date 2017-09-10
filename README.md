@@ -24,6 +24,14 @@ In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 Example block: https://github.com/statusline/statusline-block-time
 
+To installe block, run: 
+
+```bash
+statusline install block-time
+```
+
+Note: Do not type `statusline-` on the beggining of package name. 
+
  - [x] Block API for writing custom blocks (able to handle click events)
 
 Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
@@ -59,6 +67,12 @@ Something like this for now
 	]
 }
 ```
+
+## Package naming
+
+When creating package, it is important to follow naming convention. 
+
+NPM package name should be: statusline-[block/middleware/command]-[name] (for example statusline-block-time). 
 
 ## Credits
 
