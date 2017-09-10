@@ -8,6 +8,14 @@ ansi-styles@^3.1.0:
   dependencies:
     color-convert "^1.9.0"
 
+app-module-path@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/app-module-path/-/app-module-path-2.2.0.tgz#641aa55dfb7d6a6f0a8141c4b9c0aa50b6c24dd5"
+
+bluebird@^3.4.1:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.0.tgz#791420d7f551eea2897453a8a77653f96606d67c"
+
 chalk@^2.0.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.1.0.tgz#ac5becf14fa21b99c6c92ca7a7d7cfd5b17e743e"
@@ -39,6 +47,12 @@ log-symbols@^2.0.0:
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-2.0.0.tgz#595e63be4d5c8cbf294a9e09e0d5629f5913fc0c"
   dependencies:
     chalk "^2.0.1"
+
+npm-programmatic@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/npm-programmatic/-/npm-programmatic-0.0.8.tgz#377c4eec3a7ac4a126fc54241272acab33c7a5f6"
+  dependencies:
+    bluebird "^3.4.1"
 
 supports-color@^4.0.0:
   version "4.4.0"

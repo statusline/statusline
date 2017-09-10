@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-global.SILENT = true;
-
 const fs = require('fs');
 
 const status = require("../status");
@@ -9,6 +7,8 @@ const console = require("../console");
 
 const i3status = {
 	init: function(){
+		global.SILENT = true;
+
 		console.output("{\"version\":1, \"click_events\": true}");
 		console.output("[{}");
 

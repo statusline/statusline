@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/statusline/statusline#readme",
   "dependencies": {
-    "log-symbols": "^2.0.0"
+    "app-module-path": "^2.2.0",
+    "log-symbols": "^2.0.0",
+    "npm-programmatic": "^0.0.8"
   }
 }
