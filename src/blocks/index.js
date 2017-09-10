@@ -3,7 +3,14 @@ module.exports = function(block){
 		time: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
-					text: " "+new Date() + " "
+					text: "  "+new Date().toLocaleDateString() + " "
+				});
+			});
+		},
+		date: function(block){
+			return new Promise((resolve, reject) => {
+				resolve({
+					text: "  "+new Date().toLocaleTimeString() + " "
 				});
 			});
 		},
@@ -21,7 +28,7 @@ module.exports = function(block){
 				ifaces = ifaces.join(", ");
 
 				resolve({
-					text: " "+ifaces+" "
+					text: "  "+ifaces+" "
 				});
 			});
 		},
@@ -35,7 +42,7 @@ module.exports = function(block){
 					stdout = stdout.split(", ")[0];
 
 					resolve({
-						text: " "+stdout+" "
+						text: "  "+stdout+" "
 					});
 				});
 			});
@@ -69,7 +76,7 @@ module.exports = function(block){
 					}
 
 					resolve({
-						text: " Battery left: "+percentage+"% "
+						text: " : "+percentage+"% "
 					});
 				});
 			});
