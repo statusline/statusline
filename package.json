@@ -22,9 +22,9 @@
   "author": "nemanjan00",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nemanjan00/i3statusjs/issues"
+    "url": "https://github.com/statusline/statusline/issues"
   },
-  "homepage": "https://github.com/nemanjan00/i3statusjs#readme",
+  "homepage": "https://github.com/statusline/statusline#readme",
   "dependencies": {
     "log-symbols": "^2.0.0"
   }
