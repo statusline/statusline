@@ -28,6 +28,7 @@
   "dependencies": {
     "app-module-path": "^2.2.0",
     "log-symbols": "^2.0.0",
-    "npm-programmatic": "^0.0.8"
+    "npm-programmatic": "^0.0.8",
+    "statusline-block-time": "^1.0.1"
   }
 }
