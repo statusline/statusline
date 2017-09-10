@@ -24,7 +24,12 @@ const status = {
 	},
 	addBlock: function(block){
 		if(blocks[block.name] == undefined){
-			blocks[block.name] = require("statusline-block"+block.name);
+			try{
+				blocks[block.name] = require("statusline-block"+block.name);
+			} catch(e) {
+				console.error("Block "+block.name+" not found.");
+				process.exit();
+			}
 		}
 
 		block.id = status.id++;
