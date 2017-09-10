@@ -30,6 +30,8 @@ I was thinking about giving options object to package function and getting back 
 
  - [ ] Command API for creating output for different applications, for example tmux status... 
 
+Only i3status avaulable. It is built in. 
+
  - [x] Config system 
 
 Something like this for now
@@ -54,5 +56,5 @@ Something like this for now
 }
 ```
 
-Both middleware and blocks will be able to start rerender and there will be built in middleware for rerendering each x seconds. 
+
 
