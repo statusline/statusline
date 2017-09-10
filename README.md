@@ -4,7 +4,19 @@ This project is in development
 
 ![Screenshot](https://github.com/nemanjan00/statusline/blob/master/screenshot/screenshot.png?raw=true)
 
-Features I plan to implement: 
+## Usage
+
+### Installation
+
+```bash
+npm install -g statusline
+```
+
+### Using within i3bar
+
+In `~/.i3/config` find status\_command and set it to `statusline i3status`.
+
+## Features 
 
  * Package manager (for installing packets inside users home, npm based)
 
