@@ -18,6 +18,10 @@ sudo npm install -g statusline
 
 In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
+### Configuration
+
+Your default config will be stored in: `~/.statusline.conf` when you run `statusline i3config` for the first time. 
+
 ## Features 
 
  - [x] Package manager (for installing packets inside users home, npm based)
