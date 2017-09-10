@@ -25,7 +25,7 @@ const status = {
 	addBlock: function(block){
 		if(blocks[block.name] == undefined){
 			try{
-				blocks[block.name] = require("statusline-block"+block.name);
+				blocks[block.name] = require("statusline-block-"+block.name);
 			} catch(e) {
 				console.error("Block "+block.name+" not found.");
 				process.exit();
