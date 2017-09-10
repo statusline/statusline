@@ -44,6 +44,8 @@ Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
 
 I was thinking about giving options object to package function and getting back object with default output and object for templating engine, for user defined text. 
 
+If you are developing block, keep in mind Promise may get replaced with EventEmmiter at a point in time... 
+
  - [ ]  Middleware API for writing middleware that can alter final output
 
  - [ ] Command API for creating output for different applications, for example tmux status... 
