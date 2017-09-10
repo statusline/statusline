@@ -1,7 +1,9 @@
 const console = require("../console");
 
+let type = true;
+
 module.exports = {
-	time: {
+	date: {
 		render: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
@@ -10,19 +12,25 @@ module.exports = {
 			});
 		}
 	},
-	date: {
-		render: function(block){
+	time: {
+		onClick: function(click, block, status){
+			type = !type;
+		},
+		render: function(block, status){
 			return new Promise((resolve, reject) => {
-				resolve({
-					text: "   "+new Date().toLocaleTimeString() + " "
-				});
+				if(type){
+					resolve({
+						text: "   "+new Date().toLocaleTimeString() + " "
+					});
+				} else {
+					resolve({
+						text: "   "+new Date().toLocaleDateString() + " "
+					});
+				}
 			});
 		},
 	},
 	ip: {
-		onClick: function(){
-			console.log(123);
-		},
 		render: function(block){
 			return new Promise((resolve, reject) => {
 				var os = require('os');

@@ -23,7 +23,7 @@ const status = {
 	},
 	renderBlock(block){
 		return new Promise((resolve, reject) => {
-			var result = blocks[block.name].render().then((result) => {
+			var result = blocks[block.name].render(block, status).then((result) => {
 				resolve({
 					"name":"block"+block.id,
 					"instance":"/home",
@@ -57,7 +57,8 @@ process.stdin.on('readable', () => {
 
 			status.blocks.forEach(function(block){
 				if(block.id == id && blocks[block.name].onClick != undefined){
-					blocks[block.name].onClick(click, block);
+					blocks[block.name].onClick(click, block, status);
+					status.render();
 				}
 			})
 		} catch (e) {
