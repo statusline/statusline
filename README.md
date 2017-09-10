@@ -73,6 +73,7 @@ Something like this for now
 	]
 }
 ```
+ - [ ] Async rendering and error handling
 
 ## Package naming
 
