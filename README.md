@@ -2,6 +2,8 @@
 
 This project is in development
 
+Statusline is modular status line for use with i3bar, tmux, etc. 
+
 ![Screenshot](https://github.com/nemanjan00/statusline/blob/master/screenshot/screenshot.png?raw=true)
 
 ## Usage
