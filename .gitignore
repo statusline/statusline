@@ -2,3 +2,7 @@
 
 /node_modules
 
+# Vim
+
+.tern-port
+
