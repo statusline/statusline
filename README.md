@@ -24,6 +24,8 @@ In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 For now can just install packages. (They can not be used/uninstalled)
 
+Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
+
  - [x] Block API for writing custom blocks (able to handle click events)
 
 I was thinking about giving options object to package function and getting back object with default output and object for templating engine, for user defined text. 
