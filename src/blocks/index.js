@@ -7,6 +7,39 @@ module.exports = function(block){
 				});
 			});
 		},
+		ip: function(block){
+			return new Promise((resolve, reject) => {
+				var os = require('os');
+				var ifaces = os.networkInterfaces();
+
+				delete ifaces["lo"];
+
+				ifaces = Object.keys(ifaces).map(function(iface){
+					return ifaces[iface][0].address;
+				});
+
+				ifaces = ifaces.join(", ");
+
+				resolve({
+					text: " "+ifaces+" "
+				});
+			});
+		},
+		load: function(block){
+			return new Promise((resolve, reject) => {
+				var exec = require('child_process').exec;
+
+				exec("uptime", function(err, stdout, stderr) {
+					stdout = stdout.replace("\n", "");
+					stdout = stdout.split("load average:")[1];
+					stdout = stdout.split(", ")[0];
+
+					resolve({
+						text: " "+stdout+" "
+					});
+				});
+			});
+		},
 		powerline: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
