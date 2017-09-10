@@ -8,7 +8,7 @@ Features I plan to implement:
 
  * Package manager (for installing packets inside users home, npm based)
 
- * Block API for writing custom blocks
+ * Block API for writing custom blocks (able to handle click events)
 
 I was thinking about giving options object to package function and getting back object with default output and object for templating engine, for user defined text. 
 
