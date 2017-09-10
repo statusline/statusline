@@ -1,8 +1,10 @@
 const EventEmitter = require('events').EventEmitter;
+const path = require('path');
 
 const blocks = require("../blocks");
 const console = require("../console");
 const config = require("../config");
+const paths = require("../paths");
 
 
 const status = {
@@ -25,6 +27,7 @@ const status = {
 	addBlock: function(block){
 		if(blocks[block.name] == undefined){
 			try{
+				module.paths.push(path.join(paths.modulePath, "node_modules"));
 				blocks[block.name] = require("statusline-block-"+block.name);
 			} catch(e) {
 				console.error("Block "+block.name+" not found.");
