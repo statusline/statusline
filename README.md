@@ -20,9 +20,7 @@ In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 ## Features 
 
- - [x] Package manager (for installing packets inside users home, npm based)
-
-For now can just install packages. (They can not be used/uninstalled)
+ - [x] Package manager (for installing packets inside users home, npm based) (They can not be used yet)
 
 Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
 

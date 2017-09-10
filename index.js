@@ -10,6 +10,10 @@ const commands = {
 	"install": {
 		run: require("./src/commands/install"),
 		description: "block/middleware/command installer. "
+	},
+	"uninstall": {
+		run: require("./src/commands/uninstall"),
+		description: "block/middleware/command uninstaller. "
 	}
 }
 
