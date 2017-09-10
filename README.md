@@ -48,7 +48,7 @@ I was thinking about giving options object to package function and getting back 
 
  - [ ] Command API for creating output for different applications, for example tmux status... 
 
-Only i3status avaulable. It is built in. 
+Only i3status available. It is built in. 
 
  - [x] Config system 
 
