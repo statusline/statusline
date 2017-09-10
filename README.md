@@ -18,17 +18,17 @@ In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 ## Features 
 
- * Package manager (for installing packets inside users home, npm based)
+ - [ ] Package manager (for installing packets inside users home, npm based)
 
- * Block API for writing custom blocks (able to handle click events)
+ - [x] Block API for writing custom blocks (able to handle click events)
 
 I was thinking about giving options object to package function and getting back object with default output and object for templating engine, for user defined text. 
 
- * Middleware API for writing middleware that can alter final output
+ - [ ]  Middleware API for writing middleware that can alter final output
 
- * Command API for creating output for different applications, for example tmux status... 
+ - [ ] Command API for creating output for different applications, for example tmux status... 
 
- * Config system 
+ - [x] Config system 
 
 Something like this for now
 
