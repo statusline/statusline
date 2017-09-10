@@ -23,6 +23,10 @@ const status = {
 		});
 	},
 	addBlock: function(block){
+		if(blocks[block.name] == undefined){
+			blocks[block.name] = require("statusline-block"+block.name);
+		}
+
 		block.id = status.id++;
 		status.blocks.push(block);
 	},
