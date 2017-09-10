@@ -58,5 +58,7 @@ Something like this for now
 }
 ```
 
+## Credits
 
+[nemanjan00](https://github.com/nemanjan00)
 
