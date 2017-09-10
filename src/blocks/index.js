@@ -1,20 +1,29 @@
-module.exports = function(block){
-	var blocks = {
-		time: function(block){
+const console = require("../console");
+
+module.exports = {
+	time: {
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
 					text: "   "+new Date().toLocaleDateString() + " "
 				});
 			});
-		},
-		date: function(block){
+		}
+	},
+	date: {
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
 					text: "   "+new Date().toLocaleTimeString() + " "
 				});
 			});
 		},
-		ip: function(block){
+	},
+	ip: {
+		onClick: function(){
+			console.log(123);
+		},
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				var os = require('os');
 				var ifaces = os.networkInterfaces();
@@ -32,7 +41,9 @@ module.exports = function(block){
 				});
 			});
 		},
-		load: function(block){
+	},
+	load: {
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				var exec = require('child_process').exec;
 
@@ -47,14 +58,18 @@ module.exports = function(block){
 				});
 			});
 		},
-		powerline: function(block){
+	},
+	powerline: {
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				resolve({
 					text: " "
 				});
 			});
 		},
-		battery: function(block){
+	},
+	battery: {
+		render: function(block){
 			return new Promise((resolve, reject) => {
 				const fs = require("fs");
 
@@ -80,11 +95,7 @@ module.exports = function(block){
 					});
 				});
 			});
-		}
-	};
-
-	if(blocks[block.name]){
-		return blocks[block.name]();
+		},
 	}
-}
+};
 

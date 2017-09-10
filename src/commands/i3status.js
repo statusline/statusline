@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-process.env.SILENT = true;
+global.SILENT = true;
 
 const fs = require('fs');
 

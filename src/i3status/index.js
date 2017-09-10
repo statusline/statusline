@@ -4,6 +4,7 @@ const blocks = require("../blocks");
 const status = {
 	blocks: [],
 	inited: false,
+	id: 0,
 
 	render: function(){
 		let output = status.blocks.map(status.renderBlock);
@@ -12,7 +13,7 @@ const status = {
 			if(!status.inited){
 				status.inited = true;
 
-				console.output("{\"version\":1}");
+				console.output("{\"version\":1, \"click_events\": true}");
 				console.output("[");
 				console.output(JSON.stringify(output));
 			} else {
@@ -22,9 +23,9 @@ const status = {
 	},
 	renderBlock(block){
 		return new Promise((resolve, reject) => {
-			var result = blocks(block).then((result) => {
+			var result = blocks[block.name].render().then((result) => {
 				resolve({
-					"name":"disk_info",
+					"name":"block"+block.id,
 					"instance":"/home",
 					"markup":"none",
 					"full_text": result.text,
@@ -37,9 +38,33 @@ const status = {
 		});
 	},
 	addBlock: function(block){
+		block.id = status.id++;
 		status.blocks.push(block);
 	}
 }
+
+process.stdin.on('readable', () => {
+	let chunk = process.stdin.read();
+	if (chunk !== null) {
+
+		if(chunk.indexOf(",") === 0 && chunk.length > 10){
+			chunk = chunk.slice(1);
+		}
+
+		try {
+			const click = JSON.parse(chunk);
+			const id = click.name.replace("block", "");
+
+			status.blocks.forEach(function(block){
+				if(block.id == id && blocks[block.name].onClick != undefined){
+					blocks[block.name].onClick(click, block);
+				}
+			})
+		} catch (e) {
+			console.log(e+"");
+		}
+	}
+});
 
 module.exports = status;
 
