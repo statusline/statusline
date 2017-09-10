@@ -20,11 +20,13 @@ In `~/.i3/config` find `status_command` and set it to `statusline i3status`.
 
 ## Features 
 
- - [x] Package manager (for installing packets inside users home, npm based) (They can not be used yet)
+ - [x] Package manager (for installing packets inside users home, npm based)
 
-Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
+Example block: https://github.com/statusline/statusline-block-time
 
  - [x] Block API for writing custom blocks (able to handle click events)
+
+Blocks available so far: `ip`, `load`, `time`, `date`, `battery`
 
 I was thinking about giving options object to package function and getting back object with default output and object for templating engine, for user defined text. 
 
