@@ -1,6 +1,6 @@
 {
   "name": "statusline",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Universal status line implementation in Node.JS",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/statusline/statusline#readme",
   "dependencies": {
-    "app-module-path": "^2.2.0",
     "log-symbols": "^2.0.0",
     "npm-programmatic": "^0.0.8",
     "statusline-block-time": "^1.0.1"
