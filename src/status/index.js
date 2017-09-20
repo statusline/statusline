@@ -13,6 +13,8 @@ const status = {
 
 	emitter: new EventEmitter(),
 
+	log: console.toFile,
+
 	init: function(){
 		return new Promise(function(resolve, reject){
 			config.loadConfig().then((config) => {
@@ -62,8 +64,8 @@ const status = {
 			});
 		});
 	},
-	clickBlock: function(id){
-		status.blocks.forEach(function(block, click = null){
+	clickBlock: function(id, click = null){
+		status.blocks.forEach(function(block){
 			if(block.id == id && blocks[block.name].onClick != undefined){
 				blocks[block.name].onClick(click, block, status);
 				status.render();
