@@ -4,7 +4,7 @@ This project is in development
 
 Statusline is modular status line for use with i3bar, tmux, etc. 
 
-![Screenshot](https://github.com/nemanjan00/statusline/blob/master/screenshot/screenshot.png?raw=true)
+![Screenshot](https://i.imgur.com/XbqhKgu.png)
 
 [My config](https://gist.github.com/ef0998ba940a496feb212630b5e19f40)
 
