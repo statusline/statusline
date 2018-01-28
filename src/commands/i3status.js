@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-
 const status = require("../status");
 const console = require("../console");
 
@@ -24,7 +22,7 @@ const i3status = {
 		console.output(", "+JSON.stringify(output));
 	},
 	listenForClicks: function(){
-		process.stdin.on('readable', () => {
+		process.stdin.on("readable", () => {
 			let chunk = process.stdin.read();
 			if (chunk !== null) {
 
@@ -43,11 +41,11 @@ const i3status = {
 			}
 		});
 	}
-}
+};
 
-module.exports = function(argv){
+module.exports = function(){
 	status.init().then(function(){
 		i3status.init();
 	});
-}
+};
 

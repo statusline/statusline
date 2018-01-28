@@ -15,8 +15,10 @@ module.exports = function(commands){
 		description: "This"
 	};
 
+	let command;
+
 	do {
-		var command = process.argv.shift();
+		command = process.argv.shift();
 	} while(command != undefined && Object.keys(commands).indexOf(command) === -1);
 
 	if(!command){
@@ -24,6 +26,6 @@ module.exports = function(commands){
 		command = "help";
 	}
 
-	commands[command].run(process.argv)
-}
+	commands[command].run(process.argv);
+};
 

@@ -1,4 +1,4 @@
-const logSymbols = require('log-symbols');
+const logSymbols = require("log-symbols");
 const consoleOld = global.console;
 const fs = require("fs");
 
@@ -23,7 +23,7 @@ const console = {
 
 		args = args.join(" ")+"\n";
 
-		fs.appendFile(paths.logFile, args, (err) => {});
+		fs.appendFile(paths.logFile, args, () => {});
 	},
 	normal: function(){
 		if(global.SILENT){
@@ -52,7 +52,7 @@ const console = {
 
 		type.apply(this, newArguments);
 	}
-}
+};
 
 module.exports = console;
 

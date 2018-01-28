@@ -1,11 +1,11 @@
-const console = require("../console");
-
-let type = true;
+const os = require("os");
+const exec = require("child_process").exec;
+const fs = require("fs");
 
 module.exports = {
 	date: {
-		render: function(block){
-			return new Promise((resolve, reject) => {
+		render: function(){
+			return new Promise((resolve) => {
 				resolve({
 					text: "   "+new Date().toLocaleDateString() + " "
 				});
@@ -13,10 +13,9 @@ module.exports = {
 		}
 	},
 	ip: {
-		render: function(block){
-			return new Promise((resolve, reject) => {
-				var os = require('os');
-				var ifaces = os.networkInterfaces();
+		render: function(){
+			return new Promise((resolve) => {
+				let ifaces = os.networkInterfaces();
 
 				delete ifaces["lo"];
 
@@ -33,11 +32,9 @@ module.exports = {
 		},
 	},
 	load: {
-		render: function(block){
-			return new Promise((resolve, reject) => {
-				var exec = require('child_process').exec;
-
-				exec("uptime", function(err, stdout, stderr) {
+		render: function(){
+			return new Promise((resolve) => {
+				exec("uptime", function(err, stdout) {
 					stdout = stdout.replace("\n", "");
 					stdout = stdout.split("load average:")[1];
 					stdout = stdout.split(", ")[0];
@@ -50,8 +47,8 @@ module.exports = {
 		},
 	},
 	powerline: {
-		render: function(block){
-			return new Promise((resolve, reject) => {
+		render: function(){
+			return new Promise((resolve) => {
 				resolve({
 					text: " "
 				});
@@ -59,10 +56,8 @@ module.exports = {
 		},
 	},
 	battery: {
-		render: function(block){
-			return new Promise((resolve, reject) => {
-				const fs = require("fs");
-
+		render: function(){
+			return new Promise((resolve) => {
 				fs.readFile("/sys/class/power_supply/BAT0/uevent", (err, data) => {
 					data = (data+"").split("\n");
 
@@ -72,32 +67,32 @@ module.exports = {
 						let value = line.split("=");
 
 						values[value[0]] = value[1];
-					})
+					});
 
-					var currentEnergy = values["POWER_SUPPLY_ENERGY_NOW"] || values["POWER_SUPPLY_CHARGE_NOW"];
-					var maxEnergy = values["POWER_SUPPLY_ENERGY_FULL"] || values["POWER_SUPPLY_CHARGE_FULL"];
+					let currentEnergy = values["POWER_SUPPLY_ENERGY_NOW"] || values["POWER_SUPPLY_CHARGE_NOW"];
+					let maxEnergy = values["POWER_SUPPLY_ENERGY_FULL"] || values["POWER_SUPPLY_CHARGE_FULL"];
 
-					var percentage = Math.round(currentEnergy / maxEnergy * 100);
+					let percentage = Math.round(currentEnergy / maxEnergy * 100);
 
 					if(percentage > 100){
 						percentage = 100;
 					}
 
-					var icons = {
+					const icons = {
 						"Discharging": "",
 						"Charging": "",
 						"Full": "",
 						"Unknown": ""
 					};
 
-					var icon = icons[values["POWER_SUPPLY_STATUS"]] || "";
+					let icon = icons[values["POWER_SUPPLY_STATUS"]] || "";
 
 					resolve({
 						text: "  " + icon + " "+percentage+"% "
 					});
 				});
 			});
-		},
+		}
 	}
 };
 

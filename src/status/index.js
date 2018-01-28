@@ -1,5 +1,5 @@
-const EventEmitter = require('events').EventEmitter;
-const path = require('path');
+const EventEmitter = require("events").EventEmitter;
+const path = require("path");
 
 const blocks = require("../blocks");
 const console = require("../console");
@@ -16,7 +16,7 @@ const status = {
 	log: console.toFile,
 
 	init: function(){
-		return new Promise(function(resolve, reject){
+		return new Promise(function(resolve){
 			config.loadConfig().then((config) => {
 				config.blocks.forEach(function(block){
 					status.addBlock(block);
@@ -49,8 +49,8 @@ const status = {
 		});
 	},
 	renderBlock(block){
-		return new Promise((resolve, reject) => {
-			var result = blocks[block.name].render(block, status).then((result) => {
+		return new Promise((resolve) => {
+			blocks[block.name].render(block, status).then((result) => {
 				resolve({
 					"name":"block"+block.id,
 					"instance":"/home",
@@ -70,9 +70,9 @@ const status = {
 				blocks[block.name].onClick(click, block, status);
 				status.render();
 			}
-		})
+		});
 	}
-}
+};
 
 module.exports = status;
 

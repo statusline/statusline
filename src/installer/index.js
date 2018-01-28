@@ -1,5 +1,5 @@
-const npm = require('npm-programmatic');
-const fs = require('fs');
+const npm = require("npm-programmatic");
+const fs = require("fs");
 const path = require("path");
 
 const paths = require("../paths");
@@ -21,12 +21,10 @@ const install = {
 				npm.install([package], {
 					cwd:paths.modulePath,
 					save:true
-				})
-				.then(function(){
+				}).then(function(){
 					console.success("Installed "+package+"...");
 					resolve();
-				})
-				.catch(function(){
+				}).catch(function(){
 					console.error("Error installing "+package+"...");
 					reject();
 				});
@@ -44,12 +42,10 @@ const install = {
 				npm.install([package], {
 					cwd:paths.modulePath,
 					save:true
-				})
-				.then(function(){
+				}).then(function(){
 					console.success("Unstalled "+package+"...");
 					resolve();
-				})
-				.catch(function(){
+				}).catch(function(){
 					console.error("Error uninstalling "+package+"...");
 					reject();
 				});
@@ -58,6 +54,6 @@ const install = {
 
 		Promise.all(promises).then(function(){}).catch(function(){});
 	}
-}
+};
 
 module.exports = install;

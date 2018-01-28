@@ -1,5 +1,5 @@
 const paths = require("../paths");
-const fs = require('fs');
+const fs = require("fs");
 
 const console = require("../console");
 
@@ -15,7 +15,7 @@ const config = {
 	},
 
 	loadConfig: function(){
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			config.exists().then((exists) => {
 				if(exists){
 					config.loadConfigFile().then(function(config){
@@ -26,14 +26,14 @@ const config = {
 
 					config.writeConfigFile(config.default).then(() => {
 						console.success("Written default config");
-					})
+					});
 				}
 			});
 		});
 	},
 
 	exists: () => {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			fs.access(paths.configFile, (err) => {
 				if (!err) {
 					resolve(true);
@@ -45,7 +45,7 @@ const config = {
 	},
 	writeConfigFile: (config) => {
 		return new Promise((resolve, reject) => {
-			fs.writeFile(paths.configFile, JSON.stringify(config, null, 2), (err, fd) => {
+			fs.writeFile(paths.configFile, JSON.stringify(config, null, 2), (err) => {
 				if (err){
 					reject(err);
 				}
@@ -54,7 +54,7 @@ const config = {
 			});
 		});
 	},
-	loadConfigFile: (config) => {
+	loadConfigFile: () => {
 		return new Promise((resolve, reject) => {
 			fs.readFile(paths.configFile, (err, data) => {
 				if (err){
