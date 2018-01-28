@@ -1,6 +1,6 @@
 {
   "name": "statusline",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Universal status line implementation in Node.JS",
   "main": "index.js",
   "scripts": {
