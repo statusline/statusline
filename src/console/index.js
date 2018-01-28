@@ -30,7 +30,7 @@ const console = {
 			return;
 		}
 
-		var newArguments = Object.keys(arguments).map((key) => {
+		const newArguments = Object.keys(arguments).map((key) => {
 			return arguments[key];
 		});
 
@@ -44,7 +44,7 @@ const console = {
 
 		let arguments = argumentsObject;
 
-		var newArguments = Object.keys(arguments).map((key) => {
+		const newArguments = Object.keys(arguments).map((key) => {
 			return arguments[key];
 		});
 
