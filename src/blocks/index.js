@@ -74,14 +74,26 @@ module.exports = {
 						values[value[0]] = value[1];
 					})
 
-					var percentage = Math.round(values["POWER_SUPPLY_ENERGY_NOW"] || values["POWER_SUPPLY_CHARGE_NOW"] / values["POWER_SUPPLY_ENERGY_FULL"] || values["POWER_SUPPLY_CHARGE_FULL"] * 100);
+					var currentEnergy = values["POWER_SUPPLY_ENERGY_NOW"] || values["POWER_SUPPLY_CHARGE_NOW"];
+					var maxEnergy = values["POWER_SUPPLY_ENERGY_FULL"] || values["POWER_SUPPLY_CHARGE_FULL"];
+
+					var percentage = Math.round(currentEnergy / maxEnergy * 100);
 
 					if(percentage > 100){
 						percentage = 100;
 					}
 
+					var icons = {
+						"Discharging": "",
+						"Charging": "",
+						"Full": "",
+						"Unknown": ""
+					};
+
+					var icon = icons[values["POWER_SUPPLY_STATUS"]] || "";
+
 					resolve({
-						text: "  : "+percentage+"% "
+						text: "  " + icon + " "+percentage+"% "
 					});
 				});
 			});
