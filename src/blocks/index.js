@@ -7,7 +7,7 @@ module.exports = {
 		render: function(){
 			return new Promise((resolve) => {
 				resolve({
-					text: "   "+new Date().toLocaleDateString() + " "
+					text: "  "+new Date().toLocaleDateString() + " "
 				});
 			});
 		}
@@ -26,7 +26,7 @@ module.exports = {
 				ifaces = ifaces.join(", ");
 
 				resolve({
-					text: "   "+ifaces+" "
+					text: "  "+ifaces+" "
 				});
 			});
 		},
@@ -40,7 +40,7 @@ module.exports = {
 					stdout = stdout.split(", ")[0];
 
 					resolve({
-						text: "   "+stdout+" "
+						text: "  "+stdout+" "
 					});
 				});
 			});
