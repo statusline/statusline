@@ -1,23 +1,32 @@
 {
   "name": "statusline",
-  "version": "0.1.13",
-  "description": "Universal status line implementation in Node.JS",
+  "version": "0.2.0",
+  "description": "Universal status line for i3bar, swaybar, waybar, polybar, lemonbar, tmux and the terminal",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint index.js src/"
   },
   "bin": {
     "statusline": "index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nemanjan00/i3statusjs.git"
+    "url": "git+https://github.com/statusline/statusline.git"
   },
   "keywords": [
     "i3status",
-    "node.js",
+    "i3bar",
+    "swaybar",
+    "waybar",
+    "polybar",
+    "lemonbar",
+    "tmux",
+    "statusline",
+    "status-line",
     "i3wm",
-    "i3-wm"
+    "sway",
+    "hyprland",
+    "node.js"
   ],
   "author": "nemanjan00",
   "license": "MIT",
@@ -29,5 +38,11 @@
     "log-symbols": "^2.0.0",
     "npm-programmatic": "^0.0.8",
     "statusline-block-time": "^1.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.10.0"
+  },
+  "engines": {
+    "node": ">=12"
   }
 }

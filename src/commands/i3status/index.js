@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const status = require("../status");
-const console = require("../console");
+const status = require("../../status");
+const console = require("../../console");
 
 const i3status = {
 	init: function(){

@@ -1,8 +1,19 @@
 const logSymbols = require("log-symbols");
-const consoleOld = global.console;
 const fs = require("fs");
 
 const paths = require("../paths");
+
+const consoleOld = global.console;
+
+/**
+ * Turns an arguments object into a plain array.
+ *
+ * @param {Object} argumentsObject Arguments to convert
+ * @returns {Array} The same values as an array
+ */
+const toArray = function(argumentsObject){
+	return Array.prototype.slice.call(argumentsObject);
+};
 
 const console = {
 	log: function(){
@@ -14,45 +25,39 @@ const console = {
 	error: function(){
 		console.print(consoleOld.error, logSymbols.error, arguments);
 	},
+
+	/**
+	 * Appends a line to the log file.
+	 *
+	 * Used instead of stdout whenever stdout belongs to a bar protocol, where a
+	 * stray log line would corrupt the stream.
+	 */
 	toFile: function(){
-		let args = arguments;
+		const line = toArray(arguments).join(" ") + "\n";
 
-		args = Object.keys(args).map(function(argument){
-			return args[argument];
-		});
-
-		args = args.join(" ")+"\n";
-
-		fs.appendFile(paths.logFile, args, () => {});
+		fs.appendFile(paths.logFile, line, () => {});
 	},
 	normal: function(){
 		if(global.SILENT){
 			return;
 		}
 
-		const newArguments = Object.keys(arguments).map((key) => {
-			return arguments[key];
-		});
-
-		consoleOld.log.apply(this, newArguments);
+		consoleOld.log.apply(this, toArray(arguments));
 	},
-	output: consoleOld.log, 
+	output: consoleOld.log,
+
+	/**
+	 * Prints a message with a status symbol in front of it.
+	 *
+	 * @param {Function} type Function to print with
+	 * @param {string} sign Symbol to print in front of the message
+	 * @param {Object} argumentsObject Message parts
+	 */
 	print: function(type, sign, argumentsObject){
-		if(global.SILENT == true){
-			type = console.toFile;
-		}
+		const print = global.SILENT === true ? console.toFile : type;
 
-		let arguments = argumentsObject;
-
-		const newArguments = Object.keys(arguments).map((key) => {
-			return arguments[key];
-		});
-
-		newArguments.unshift(sign+" ");
-
-		type.apply(this, newArguments);
+		print.apply(this, [sign + " "].concat(toArray(argumentsObject)));
 	}
 };
 
 module.exports = console;
-
