@@ -1,6 +1,7 @@
 const status = require("../../status");
 const ansi = require("../../utils/ansi");
 const regions = require("../../utils/regions");
+const markup = require("../../utils/markup");
 
 const DEFAULT_INTERVAL = 1000;
 const DEFAULT_COLUMNS = 80;
@@ -35,16 +36,18 @@ const tui = {
 		return blocks.filter((block) => {
 			return block.full_text !== "";
 		}).reduce((state, block) => {
-			const text = block.full_text;
+			const width = markup.length(block.full_text);
 
-			const painted = ansi.color(block.background, true) + ansi.color(block.color, false) + text + ansi.reset;
+			const prefix = ansi.color(block.background, true) + ansi.color(block.color, false);
+
+			const painted = prefix + markup.toAnsi(block.full_text, prefix) + ansi.reset;
 
 			return {
 				text: state.text + painted,
-				width: state.width + text.length,
+				width: state.width + width,
 				ranges: state.ranges.concat([{
 					start: state.width,
-					end: state.width + text.length - 1,
+					end: state.width + width - 1,
 					id: ("" + block.name).replace("block", "")
 				}])
 			};

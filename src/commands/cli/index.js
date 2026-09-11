@@ -2,6 +2,7 @@ const status = require("../../status");
 const console = require("../../console");
 const ansi = require("../../utils/ansi");
 const regions = require("../../utils/regions");
+const markup = require("../../utils/markup");
 
 const DEFAULT_INTERVAL = 1000;
 const DEFAULT_COLUMNS = 80;
@@ -21,13 +22,15 @@ const paint = function(blocks, colored){
 	return {
 		text: visible.map((block) => {
 			if(!colored){
-				return block.full_text;
+				return markup.strip(block.full_text);
 			}
 
-			return ansi.color(block.background, true) + ansi.color(block.color, false) + block.full_text + ansi.reset;
+			const prefix = ansi.color(block.background, true) + ansi.color(block.color, false);
+
+			return prefix + markup.toAnsi(block.full_text, prefix) + ansi.reset;
 		}).join(""),
 		width: visible.reduce((width, block) => {
-			return width + block.full_text.length;
+			return width + markup.length(block.full_text);
 		}, 0)
 	};
 };

@@ -7,6 +7,7 @@
 module.exports = {
 	battery: require("./battery"),
 	brightness: require("./brightness"),
+	clock: require("./clock"),
 	cpu: require("./cpu"),
 	date: require("./date"),
 	gpu: require("./gpu"),

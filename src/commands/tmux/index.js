@@ -1,6 +1,7 @@
 const status = require("../../status");
 const console = require("../../console");
 const regions = require("../../utils/regions");
+const markup = require("../../utils/markup");
 
 const DEFAULT_INTERVAL = 1000;
 
@@ -22,10 +23,10 @@ const paint = function(block){
 	}
 
 	if(parts.length === 0){
-		return block.full_text;
+		return markup.strip(block.full_text);
 	}
 
-	return "#[" + parts.join(",") + "]" + block.full_text + "#[default]";
+	return "#[" + parts.join(",") + "]" + markup.strip(block.full_text) + "#[default]";
 };
 
 /**
@@ -62,12 +63,14 @@ module.exports = function(args = []){
 			return block.full_text !== "";
 		}).map((block) => {
 			if(plain){
-				return block.full_text;
+				return markup.strip(block.full_text);
 			}
 
 			return paint(block);
 		}).join(""));
 	});
+
+	status.setRegion(region);
 
 	return status.init().then(() => {
 		if(watch){

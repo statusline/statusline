@@ -1,7 +1,9 @@
 const compositor = require("../../services/compositor");
+const markup = require("../../utils/markup");
 
-const FOCUSED_PREFIX = "[";
-const FOCUSED_SUFFIX = "]";
+const FOCUSED_COLOR = "#000000";
+const FOCUSED_BACKGROUND = "#50fa7b";
+const DEFAULT_PADDING = 1;
 const LEFT_BUTTON = 1;
 const SCROLL_UP = 4;
 const SCROLL_DOWN = 5;
@@ -9,35 +11,50 @@ const SCROLL_DOWN = 5;
 /**
  * Where each workspace ended up in the text of the last render, so a click can
  * be traced back to the workspace under the pointer.
+ *
+ * Offsets are into the visible text, never the markup, since what a bar
+ * measures when it reports a click is what it drew.
  */
 let layout = [];
 
 /**
  * Builds the rendered text, recording the character range each workspace covers.
  *
+ * The focused workspace is picked out in colour rather than wrapped in
+ * brackets, so the block keeps the same width whichever workspace is focused
+ * and the numbers stop shuffling sideways as you switch.
+ *
+ * Each workspace is padded on both sides and the padding sits inside the
+ * colour, so the focused one reads as a button rather than a tinted digit, and
+ * so the click target is bigger than a single character.
+ *
  * @param {{names: string[], focused: string}} state Workspace state
- * @param {string} prefix Drawn before the focused workspace
- * @param {string} suffix Drawn after the focused workspace
- * @returns {{text: string, layout: Array<{name: string, start: number, end: number}>}} Text and ranges
+ * @param {{color: string, background: string}} focused Colours for the focused one
+ * @param {number} padding Spaces on each side of a workspace name
+ * @returns {{text: string, length: number, layout: Array<{name: string, start: number, end: number}>}} Text, visible length and ranges
  */
-const build = function(state, prefix, suffix){
-	return state.names.reduce((built, name) => {
-		const separator = built.text === " " ? "" : " ";
+const build = function(state, focused, padding){
+	const spaces = " ".repeat(padding);
 
-		const label = name === state.focused ? prefix + name + suffix : name;
+	return state.names.reduce((current, name) => {
+		const label = spaces + markup.escape(name) + spaces;
 
-		const start = built.text.length + separator.length;
+		const painted = name === state.focused ? "<span foreground=\"" + focused.color + "\" background=\"" + focused.background + "\">" + label + "</span>" : label;
+
+		const width = name.length + spaces.length * 2;
 
 		return {
-			text: built.text + separator + label,
-			layout: built.layout.concat([{
+			text: current.text + painted,
+			length: current.length + width,
+			layout: current.layout.concat([{
 				name: name,
-				start: start,
-				end: start + label.length - 1
+				start: current.length,
+				end: current.length + width - 1
 			}])
 		};
 	}, {
-		text: " ",
+		text: "",
+		length: 0,
 		layout: []
 	});
 };
@@ -52,7 +69,7 @@ const build = function(state, prefix, suffix){
  * font, which is the usual case.
  *
  * @param {Object} click Click event
- * @param {number} length Length of the rendered text
+ * @param {number} length Visible length of the rendered text
  * @returns {?string} Workspace name, or null when the click missed
  */
 const workspaceAt = function(click, length){
@@ -74,14 +91,19 @@ const workspaceAt = function(click, length){
 };
 
 /**
- * Shows the workspaces that exist, with the focused one marked.
+ * Shows the workspaces that exist, with the focused one picked out in colour.
  *
  * Click a workspace to go to it, or scroll to move between them. Works under
  * Hyprland, Sway and i3.
  *
+ * Clicking a particular workspace needs a bar that reports where inside a block
+ * the click landed. The i3bar protocol does, and so does the terminal. A waybar
+ * custom module does not, so under waybar use waybar's own workspaces module.
+ *
  * customOptions:
- *   prefix - drawn before the focused workspace, defaults to "["
- *   suffix - drawn after the focused workspace, defaults to "]"
+ *   color      - text colour of the focused workspace, default "#000000"
+ *   background - background of the focused workspace, default "#50fa7b"
+ *   padding    - spaces on each side of a workspace name, default 1
  */
 module.exports = {
 	/**
@@ -99,16 +121,23 @@ module.exports = {
 	},
 	render: function(block){
 		const customOptions = block.customOptions || {};
-		const prefix = customOptions.prefix || FOCUSED_PREFIX;
-		const suffix = customOptions.suffix || FOCUSED_SUFFIX;
+
+		const focused = {
+			color: customOptions.color || FOCUSED_COLOR,
+			background: customOptions.background || FOCUSED_BACKGROUND
+		};
+
+		const padding = customOptions.padding === undefined ? DEFAULT_PADDING : customOptions.padding;
 
 		return compositor.workspaces().then((state) => {
-			const built = build(state, prefix, suffix);
+			const built = build(state, focused, padding);
 
 			layout = built.layout;
 
 			return {
-				text: built.text + " "
+				text: built.text,
+				markup: "pango",
+				length: built.length
 			};
 		}).catch(() => {
 			layout = [];
@@ -137,7 +166,7 @@ module.exports = {
 
 		const length = layout.reduce((longest, entry) => {
 			return Math.max(longest, entry.end + 1);
-		}, 0) + 1;
+		}, 0);
 
 		const name = workspaceAt(click, length);
 

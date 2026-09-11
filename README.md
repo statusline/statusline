@@ -36,10 +36,13 @@ Each command renders the same blocks for a different consumer.
 | `statusline waybar` | waybar | JSON lines for a custom module |
 | `statusline tmux` | tmux | one line with tmux colour directives |
 | `statusline lemonbar` | lemonbar, polybar | one line with `%{F}` colour directives |
+| `statusline click` | bars without click events | sends a click to a named block |
 
 Global flags: `--config <name>` picks a named config, and every command takes
 `--interval <ms>`. `cli` takes `--width <n>` and `--plain`; `tmux` and `waybar`
-take `--region <left|center|right>`.
+take `--region <left|center|right>`, and `waybar` also takes
+`--blocks <a,b,c>`. A command given a region or a block list never registers
+the other blocks at all, so a module costs only what it draws.
 
 ### i3 and sway
 
@@ -165,7 +168,9 @@ a workspace switch costs about 3ms rather than 35ms.
 ```
 
 Watched blocks default to a 10 second interval as a safety net, everything else
-to one second.
+to one second. A block can also declare `cacheable: false` and never be served
+from the cache. Clicking a block throws its cached value away, since a click
+usually changes the very thing it reports.
 
 The config file is watched too. Save it and the bar rebuilds itself; there is no
 need to restart the bar to try a change.
@@ -198,6 +203,36 @@ predictable, but nothing is aligned.
 `powerlineSeparator` decorates each region separately, so an arrow never bridges
 the gap between two sides of the bar.
 
+## Clicks, and what each bar can do with them
+
+The i3bar protocol reports a click with the position inside the block, which is
+what lets `workspaces` tell which number was clicked. The terminal does the
+same. waybar does not: a custom module is one widget, and its `on-click` runs a
+command with no pointer position at all.
+
+So under waybar:
+
+- give each clickable block its own module with `--blocks <name>`, and point its
+  hooks at `statusline click <name> <button>`. A module wide hook cannot tell
+  the clock from the volume, and clicking the clock would act on whichever block
+  the hook named
+- for workspaces, use waybar's own `hyprland/workspaces` or `sway/workspaces`.
+  It draws real buttons, so clicking, scrolling and its CSS states work
+
+```json
+"custom/statusline-volume": {
+    "exec": "statusline waybar --blocks volume",
+    "return-type": "json",
+    "escape": false,
+    "on-click": "statusline click volume 1",
+    "on-scroll-up": "statusline click volume 4",
+    "on-scroll-down": "statusline click volume 5"
+}
+```
+
+Each module is a process, so this trades memory for clickability. Under i3bar or
+swaybar one process does everything and every click works, with no hooks.
+
 ## Named configs
 
 The default config is `~/.statusline.conf`. Named ones live in
@@ -220,7 +255,7 @@ All of these are built in. Anything else is installed from npm.
 
 | Block | Shows | Clickable |
 | --- | --- | --- |
-| `workspaces` | workspaces, focused one in brackets | click one to go to it, scroll to cycle |
+| `workspaces` | workspaces, focused one in colour | click one to go to it, scroll to cycle |
 | `window` | focused window title | |
 | `media` | what is playing, via playerctl | play/pause, next, previous |
 | `volume` | output volume | scroll to change, click to mute |
@@ -253,7 +288,8 @@ Set these under `customOptions`.
 
 | Block | Option | Meaning |
 | --- | --- | --- |
-| `workspaces` | `prefix`, `suffix` | drawn around the focused workspace, default `[` and `]` |
+| `workspaces` | `color`, `background` | colours of the focused workspace |
+| `workspaces` | `padding` | spaces each side of a workspace name, default 1 |
 | `window` | `maxLength` | trim the title, default 60 |
 | `media` | `player` | restrict to one player, e.g. `spotify` |
 | `media` | `maxLength` | trim the text, default 40 |
@@ -338,7 +374,11 @@ module.exports = {
 };
 ```
 
-`render` resolves with `{text}`. Resolve with an empty string to draw nothing at
+`render` resolves with `{text}`, and may add `markup: "pango"` to say the text
+carries markup. Escape anything that came from outside before putting it in
+markup: one ampersand in a window title is enough to make a bar render the whole
+line as nothing. `src/utils/markup` has `escape`, `strip` and `length`; widths
+must be measured with `length`, never on the raw string. Resolve with an empty string to draw nothing at
 all. `block` is the entry from the config, so `block.customOptions` is where
 your options arrive.
 

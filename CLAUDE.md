@@ -98,6 +98,18 @@ an expensive block a longer interval rather than making the whole bar slow.
 The config file is watched, and a change calls `status.reload()`, which throws
 everything away and rebuilds. Block ids are reassigned on reload.
 
+**Clicks depend on the bar, and waybar is the awkward one.** The i3bar protocol
+and the TUI report a click with its position inside the block. waybar reports
+nothing: a custom module is one widget whose on-click runs a command. Hence
+`--blocks` and the `click` command, so a waybar module can carry one block and
+its hooks are unambiguous. Never wire a module wide hook to a named block on a
+module that draws several: clicking the clock would then act on the volume.
+
+**Markup.** A block may return `markup: "pango"` and colour parts of its own
+text. Outputs that cannot render markup strip it, and every width must be
+measured with `markup.length`, never `String.length`, or a block carrying tags
+is laid out as if the tags were visible. Anything from outside is escaped first.
+
 ## Invariants
 
 **Nothing may take the bar down.** A block that throws renders as empty, a

@@ -3,12 +3,14 @@ const path = require("path");
 
 const blocks = require("../blocks");
 const middleware = require("../middleware");
+const regions = require("../utils/regions");
 const console = require("../console");
 const config = require("../config");
 const paths = require("../paths");
 
 const COALESCE_DELAY = 8;
 const DEFAULT_INTERVAL = 1000;
+const CACHE_TOLERANCE = 100;
 const WATCHED_INTERVAL = 10000;
 const BLOCK_PREFIX = "statusline-block-";
 const MIDDLEWARE_PREFIX = "statusline-middleware-";
@@ -30,6 +32,8 @@ const status = {
 	middleware: [],
 	watchers: [],
 	configWatcher: null,
+	region: null,
+	only: null,
 	cache: {},
 	dirty: {},
 	id: 0,
@@ -44,6 +48,35 @@ const status = {
 	 *
 	 * @returns {Promise} Resolves once the status line is ready to render
 	 */
+	/**
+	 * Limits the status line to one region.
+	 *
+	 * A command that only draws one region says so before init, and the blocks
+	 * of the other regions are never registered at all. Without this, running
+	 * one process per region means every process renders every block and throws
+	 * most of the work away, including the subscriptions and subprocesses that
+	 * work costs.
+	 *
+	 * @param {?string} region Region to keep, or null for all of them
+	 */
+	setRegion: function(region){
+		status.region = region;
+	},
+
+	/**
+	 * Limits the status line to a named set of blocks.
+	 *
+	 * For bars that report clicks per module rather than per block: give a
+	 * module one block and its on-click is unambiguous. Without this, a module
+	 * wide on-click has to guess, and clicking the clock would act on whichever
+	 * block the hook happened to name.
+	 *
+	 * @param {?string[]} names Block names to keep, or null for all of them
+	 */
+	setBlocks: function(names){
+		status.only = names;
+	},
+
 	init: function(){
 		status.configWatcher = config.watch(() => {
 			status.reload();
@@ -100,6 +133,14 @@ const status = {
 	 * @param {Object} block Block entry from the config
 	 */
 	addBlock: function(block){
+		if(status.region !== null && (block.region || regions.defaultRegion) !== status.region){
+			return;
+		}
+
+		if(status.only !== null && status.only.indexOf(block.name) === -1){
+			return;
+		}
+
 		if(blocks[block.name] === undefined){
 			try {
 				blocks[block.name] = loadInstalled(BLOCK_PREFIX + block.name);
@@ -110,11 +151,19 @@ const status = {
 			}
 		}
 
-		const watched = blocks[block.name].watch !== undefined;
+		const definition = blocks[block.name];
+
+		const watched = definition.watch !== undefined;
+
+		let interval = block.interval || (watched ? WATCHED_INTERVAL : DEFAULT_INTERVAL);
+
+		if(definition.cacheable === false){
+			interval = 0;
+		}
 
 		status.blocks.push(Object.assign({}, block, {
 			id: status.id++,
-			interval: block.interval || (watched ? WATCHED_INTERVAL : DEFAULT_INTERVAL)
+			interval: interval
 		}));
 	},
 
@@ -186,7 +235,7 @@ const status = {
 	 */
 	update: function(block){
 		if(block){
-			status.dirty[block.id] = true;
+			status.invalidate(block);
 		}
 
 		if(status.pending){
@@ -202,6 +251,15 @@ const status = {
 		});
 
 		return status.pending;
+	},
+
+	/**
+	 * Throws away a block's cached value, so the next render asks it again.
+	 *
+	 * @param {Object} block Registered block
+	 */
+	invalidate: function(block){
+		status.dirty[block.id] = true;
 	},
 
 	/**
@@ -257,7 +315,7 @@ const status = {
 	renderBlock: function(block){
 		const cached = status.cache[block.id];
 
-		const fresh = cached !== undefined && Date.now() - cached.at < block.interval;
+		const fresh = block.interval > 0 && cached !== undefined && Date.now() - cached.at < block.interval - CACHE_TOLERANCE;
 
 		if(fresh && status.dirty[block.id] !== true){
 			return Promise.resolve(cached.output);
@@ -277,7 +335,7 @@ const status = {
 			const output = {
 				name: "block" + block.id,
 				instance: block.name,
-				markup: "none",
+				markup: result.markup || "none",
 				full_text: result.text,
 				color: block.color,
 				background: block.backgroundColor,
@@ -298,6 +356,10 @@ const status = {
 	/**
 	 * Dispatches a click to the block that was clicked, then re-renders.
 	 *
+	 * A click usually changes the very thing the block reports, so its cached
+	 * value is thrown away before the redraw. Otherwise muting would show the
+	 * old volume until the block's interval happened to come round.
+	 *
 	 * @param {string|number} id Block id taken from the click event
 	 * @param {Object} [click] Raw click event
 	 * @returns {Promise} Resolves once the click has been handled
@@ -309,6 +371,8 @@ const status = {
 
 		return Promise.all(clicked.map((block) => {
 			return Promise.resolve().then(() => {
+				status.invalidate(block);
+
 				return blocks[block.name].onClick(click, block, status);
 			}).catch((err) => {
 				console.error("Block " + block.name + " failed to handle a click: " + err.message);

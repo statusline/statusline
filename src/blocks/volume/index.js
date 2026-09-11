@@ -8,6 +8,7 @@ const DEFAULT_STEP = 5;
 const SCROLL_UP = 4;
 const SCROLL_DOWN = 5;
 const RIGHT_BUTTON = 3;
+const SINK_EVENT = /on (sink|server)\b/;
 
 /**
  * Reads volume through wpctl, the pipewire/wireplumber control tool.
@@ -146,6 +147,27 @@ const pickIcon = function(volume){
  *   headphone - use the headphone icon instead of the speaker icons
  */
 module.exports = {
+	/**
+	 * Redraws when the audio server says something changed, so the volume shown
+	 * matches the volume set the moment a key or a scroll changes it, rather
+	 * than at the next poll.
+	 *
+	 * pactl is present for pulseaudio and for pipewire through pipewire-pulse.
+	 * Without it the block simply falls back to being polled.
+	 *
+	 * @param {Object} block Block config
+	 * @param {Object} status The status line
+	 * @returns {Function} Call to stop watching
+	 */
+	watch: function(block, status){
+		return exec.stream("pactl", ["subscribe"], (line) => {
+			if(!SINK_EVENT.test(line)){
+				return;
+			}
+
+			status.update(block);
+		});
+	},
 	render: function(block){
 		const customOptions = block.customOptions || {};
 		const control = customOptions.control || "Master";

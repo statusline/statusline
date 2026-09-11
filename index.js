@@ -27,6 +27,10 @@ const commands = {
 		run: require("./src/commands/lemonbar"),
 		description: "lemonbar and polybar formatting"
 	},
+	"click": {
+		run: require("./src/commands/click"),
+		description: "send a click to a named block, for bars without click events"
+	},
 	"install": {
 		run: require("./src/commands/install"),
 		description: "block/middleware installer"

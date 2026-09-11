@@ -1,6 +1,7 @@
 const status = require("../../status");
 const console = require("../../console");
 const regions = require("../../utils/regions");
+const markup = require("../../utils/markup");
 
 const MARKERS = {
 	left: "%{l}",
@@ -20,7 +21,7 @@ const paint = function(block){
 	const foreground = block.color ? "%{F" + block.color + "}" : "";
 	const background = block.background ? "%{B" + block.background + "}" : "";
 
-	return foreground + background + block.full_text + "%{F-}%{B-}";
+	return foreground + background + markup.strip(block.full_text) + "%{F-}%{B-}";
 };
 
 /**
