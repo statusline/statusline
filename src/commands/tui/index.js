@@ -1,7 +1,9 @@
 const status = require("../../status");
 const ansi = require("../../utils/ansi");
+const regions = require("../../utils/regions");
 
 const DEFAULT_INTERVAL = 1000;
+const DEFAULT_COLUMNS = 80;
 const CTRL_C = String.fromCharCode(3);
 const QUIT_KEYS = [CTRL_C, "q"];
 
@@ -24,8 +26,42 @@ const tui = {
 	ranges: [],
 
 	/**
+	 * Paints one region, recording the column each block occupies within it.
+	 *
+	 * @param {Object[]} blocks Rendered blocks of one region
+	 * @returns {{text: string, width: number, ranges: Object[]}} Painted region
+	 */
+	paint: function(blocks){
+		return blocks.filter((block) => {
+			return block.full_text !== "";
+		}).reduce((state, block) => {
+			const text = block.full_text;
+
+			const painted = ansi.color(block.background, true) + ansi.color(block.color, false) + text + ansi.reset;
+
+			return {
+				text: state.text + painted,
+				width: state.width + text.length,
+				ranges: state.ranges.concat([{
+					start: state.width,
+					end: state.width + text.length - 1,
+					id: ("" + block.name).replace("block", "")
+				}])
+			};
+		}, {
+			text: "",
+			width: 0,
+			ranges: []
+		});
+	},
+
+	/**
 	 * Draws the status line in place, and records which columns belong to which
 	 * block so a click can be routed back.
+	 *
+	 * Each region is painted on its own and then shifted into place, because the
+	 * padding between regions moves every block to its right. Recording the
+	 * columns before padding would send clicks to the wrong block.
 	 *
 	 * Column widths are counted in characters. A double width glyph will shift
 	 * the click target of the blocks after it by one column.
@@ -33,33 +69,41 @@ const tui = {
 	 * @param {Object[]} output Rendered blocks
 	 */
 	draw: function(output){
-		const visible = output.filter((block) => {
-			return block.full_text !== "";
-		});
+		const columns = process.stdout.columns || DEFAULT_COLUMNS;
 
-		const line = visible.reduce((state, block) => {
-			const text = block.full_text;
+		const grouped = regions.group(output);
 
-			const painted = ansi.color(block.background, true) + ansi.color(block.color, false) + text + ansi.reset;
+		const painted = {
+			left: tui.paint(grouped.left),
+			center: tui.paint(grouped.center),
+			right: tui.paint(grouped.right)
+		};
 
-			return {
-				text: state.text + painted,
-				column: state.column + text.length,
-				ranges: state.ranges.concat([{
-					start: state.column,
-					end: state.column + text.length - 1,
-					id: ("" + block.name).replace("block", "")
-				}])
-			};
-		}, {
-			text: "",
-			column: 1,
-			ranges: []
-		});
+		const widths = {
+			left: painted.left.width,
+			center: painted.center.width,
+			right: painted.right.width
+		};
 
-		tui.ranges = line.ranges;
+		const offsets = regions.positions(widths, columns);
 
-		process.stdout.write(ansi.clearLine + ansi.lineStart + line.text);
+		const line = regions.layout({
+			left: painted.left.text,
+			center: painted.center.text,
+			right: painted.right.text
+		}, widths, columns);
+
+		tui.ranges = regions.order.reduce((ranges, region) => {
+			return ranges.concat(painted[region].ranges.map((range) => {
+				return {
+					id: range.id,
+					start: range.start + offsets[region] + 1,
+					end: range.end + offsets[region] + 1
+				};
+			}));
+		}, []);
+
+		process.stdout.write(ansi.clearLine + ansi.lineStart + line);
 	},
 
 	/**

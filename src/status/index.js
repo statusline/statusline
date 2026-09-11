@@ -148,6 +148,7 @@ const status = {
 				full_text: result.text,
 				color: block.color,
 				background: block.backgroundColor,
+				region: block.region,
 				separator: false,
 				separator_block_width: 0
 			};

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 const paths = require("../paths");
 const schema = require("./schema");
@@ -122,6 +123,8 @@ const config = {
 	 */
 	writeConfigFile: (contents) => {
 		return new Promise((resolve, reject) => {
+			fs.mkdirSync(path.dirname(paths.configFile), {recursive: true});
+
 			fs.writeFile(paths.configFile, JSON.stringify(contents, null, 2), (err) => {
 				if(err){
 					reject(err);

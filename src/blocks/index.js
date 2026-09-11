@@ -9,6 +9,7 @@ module.exports = {
 	brightness: require("./brightness"),
 	cpu: require("./cpu"),
 	date: require("./date"),
+	gpu: require("./gpu"),
 	ip: require("./ip"),
 	load: require("./load"),
 	media: require("./media"),

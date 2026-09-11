@@ -37,6 +37,10 @@ Each command renders the same blocks for a different consumer.
 | `statusline tmux` | tmux | one line with tmux colour directives |
 | `statusline lemonbar` | lemonbar, polybar | one line with `%{F}` colour directives |
 
+Global flags: `--config <name>` picks a named config, and every command takes
+`--interval <ms>`. `cli` takes `--width <n>` and `--plain`; `tmux` and `waybar`
+take `--region <left|center|right>`.
+
 ### i3 and sway
 
 In `~/.config/i3/config` or `~/.config/sway/config`:
@@ -53,20 +57,26 @@ In `~/.config/waybar/config`:
 
 ```json
 "custom/statusline": {
-    "exec": "statusline waybar",
+    "exec": "statusline waybar --region right",
     "return-type": "json"
 }
 ```
 
-Then add `"custom/statusline"` to `modules-right`.
+Then add `"custom/statusline"` to `modules-right`. waybar puts whole modules
+into its own left, center and right lists, so to fill all three, declare the
+module three times with a different `--region` each.
 
 ### tmux
 
 In `~/.tmux.conf`:
 
 ```
-set -g status-right "#(statusline tmux)"
+set -g status-left "#(statusline tmux --region left)"
+set -g status-right "#(statusline tmux --region right)"
 ```
+
+tmux has a separate option per side rather than one line, which is what
+`--region` is for.
 
 ### lemonbar and polybar
 
@@ -116,6 +126,7 @@ Config lives in `~/.statusline.conf` and is written on first run.
 | `blocks[].name` | block to render, built in or installed |
 | `blocks[].color` | text colour, `#rgb` or `#rrggbb` |
 | `blocks[].backgroundColor` | background colour |
+| `blocks[].region` | `left`, `center` or `right`, default `left` |
 | `blocks[].customOptions` | options for that block, listed below |
 | `middleware[].middleware` | middleware to run over the rendered output |
 | `middleware[].options` | options for that middleware |
@@ -133,6 +144,50 @@ A broken config never takes the bar down with it. The problem is reported and
 the default config is used, so there is still a status line to read the error
 on.
 
+## Regions
+
+A block can name a `region`: `left`, `center` or `right`. Blocks that name none
+land on the left, so a config written before regions existed renders as it did.
+
+```json
+{"name": "workspaces", "region": "left"},
+{"name": "window",     "region": "center"},
+{"name": "date",       "region": "right"}
+```
+
+How much a region means depends on where the output goes:
+
+| Output | Regions |
+| --- | --- |
+| `cli`, `tui` | spread across the terminal width; the centre gives way when a side grows into it |
+| `lemonbar` | native `%{l}`, `%{c}`, `%{r}` alignment |
+| `tmux`, `waybar` | pick one region per invocation with `--region` |
+| `i3status` | **not supported.** Emitted in order, but not aligned |
+
+The i3bar protocol has no notion of regions. Its status area is a single strip
+against the right of the bar, which is why i3 and sway draw workspaces
+themselves on the left. Blocks are still grouped by region so the order is
+predictable, but nothing is aligned.
+
+`powerlineSeparator` decorates each region separately, so an arrow never bridges
+the gap between two sides of the bar.
+
+## Named configs
+
+The default config is `~/.statusline.conf`. Named ones live in
+`~/.config/statusline/<name>.conf`:
+
+```bash
+statusline --config laptop i3status
+statusline --config work tui
+statusline configs                    # list them
+STATUSLINE_CONFIG=laptop statusline cli
+```
+
+`--config` also takes a path, if it looks like one. A named config that does not
+exist yet is created with the defaults on first use, so `statusline --config
+laptop cli` is all it takes to start one.
+
 ## Blocks
 
 All of these are built in. Anything else is installed from npm.
@@ -148,6 +203,7 @@ All of these are built in. Anything else is installed from npm.
 | `ip` | address of the interface reaching the network | |
 | `temperature` | CPU temperature | |
 | `cpu` | CPU usage | |
+| `gpu` | GPU usage, VRAM and temperature | |
 | `memory` | memory in use | |
 | `load` | load average | |
 | `battery` | charge, with an icon that tracks the level | |
@@ -157,7 +213,9 @@ All of these are built in. Anything else is installed from npm.
 `workspaces` and `window` work under Hyprland, Sway and i3; the compositor is
 detected at runtime. `volume` works with pipewire, pulseaudio or bare alsa,
 whichever answers first. `brightness` reads sysfs, and writes through
-brightnessctl, light or xbacklight.
+brightnessctl, light or xbacklight. `gpu` reads NVIDIA cards through nvidia-smi
+and AMD cards through sysfs; Intel cards expose no usage counter without
+elevated privileges and are not supported.
 
 Blocks that have nothing to say render nothing at all. A desktop with no battery
 and no backlight simply does not draw those blocks, so the same config works on
@@ -186,6 +244,9 @@ Set these under `customOptions`.
 | `temperature` | `path` | hwmon directory, autodetected otherwise |
 | `temperature` | `input` | input file, default `temp1_input` |
 | `temperature` | `critical` | threshold for the hottest icon, default 80 |
+| `gpu` | `card` | card index for nvidia-smi, or a name like `card0` for AMD |
+| `gpu` | `memory` | append VRAM in use |
+| `gpu` | `temperature` | append the card temperature |
 | `memory` | `absolute` | show `12.4G / 62.0G` instead of a percentage |
 | `load` | `all` | show all three averages |
 | `load` | `perCore` | divide by core count, so 1.00 means fully loaded |

@@ -23,6 +23,10 @@ const SCHEMA = {
 			},
 			customOptions: {
 				type: "object"
+			},
+			region: {
+				type: "enum",
+				values: ["left", "center", "right"]
 			}
 		}
 	},
@@ -70,6 +74,14 @@ const checkField = function(value, definition, path){
 	if(value === undefined){
 		if(definition.required){
 			return [path + " is required"];
+		}
+
+		return [];
+	}
+
+	if(definition.type === "enum"){
+		if(definition.values.indexOf(value) === -1){
+			return [path + " must be one of: " + definition.values.join(", ") + ", got " + JSON.stringify(value)];
 		}
 
 		return [];

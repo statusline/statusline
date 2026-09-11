@@ -17,6 +17,7 @@ module.exports = {
 	char: char,
 
 	cpu: char(0xF2DB),
+	gpu: char(0xF108),
 	memory: char(0xF1C0),
 	load: char(0xF0E4),
 	date: char(0xF073),

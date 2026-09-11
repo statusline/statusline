@@ -2,6 +2,7 @@
 
 const status = require("../../status");
 const console = require("../../console");
+const regions = require("../../utils/regions");
 
 const i3status = {
 	init: function(){
@@ -18,8 +19,24 @@ const i3status = {
 
 		i3status.listenForClicks();
 	},
+	/**
+	 * Prints one line of the i3bar protocol.
+	 *
+	 * The protocol has no notion of regions: the status area is a single strip
+	 * against the right of the bar, which is why i3 and sway draw workspaces
+	 * themselves on the left. Blocks are emitted grouped by region so the order
+	 * stays predictable, but nothing is aligned.
+	 *
+	 * @param {Object[]} output Rendered blocks
+	 */
 	render: function(output){
-		console.output(", "+JSON.stringify(output));
+		const grouped = regions.group(output);
+
+		const ordered = regions.order.reduce((blocks, region) => {
+			return blocks.concat(grouped[region]);
+		}, []);
+
+		console.output(", " + JSON.stringify(ordered));
 	},
 	listenForClicks: function(){
 		process.stdin.on("readable", () => {

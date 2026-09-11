@@ -19,6 +19,7 @@ yarn install
 yarn lint                    # eslint index.js src/ (flat config in eslint.config.js)
 
 node index.js help           # list output commands
+node index.js configs        # list named configs
 node index.js cli --plain    # render one line and exit, the quickest check
 node index.js tui            # live in the terminal, clickable; q or ctrl-c quits
 node index.js i3status       # i3bar protocol, reads click events on stdin
@@ -31,7 +32,12 @@ the block; the block picks up the replacement, since it calls `exec.run(...)`
 through that object rather than destructuring it.
 
 `node index.js cli` writes `~/.statusline.conf` on first run, and renders
-against the real one after that.
+against the real one after that. `--config <name>` (or `STATUSLINE_CONFIG`)
+switches to `~/.config/statusline/<name>.conf`, which is the safe way to try a
+config without touching the one driving the real bar. The flag is parsed in
+`src/cli` and applied through `paths.useConfig` before any command runs, so
+`paths.configFile` must always be read at call time, never captured at require
+time.
 
 ## Architecture
 
@@ -67,6 +73,17 @@ hyprctl speaks its own JSON while swaymsg and i3-msg share the i3 IPC format.
 The `workspaces` and `window` blocks ask it rather than learning all three.
 Detection is by environment variable first, probing the clients only as a
 fallback, and is cached per process.
+
+**Regions** are a per-block `region` field, grouped by `src/utils/regions`.
+Support is per protocol, and unevenly so: `cli` and `tui` spread them across the
+terminal width, `lemonbar` has native alignment markers, `tmux` and `waybar`
+take one region per invocation, and the i3bar protocol cannot express them at
+all — its status area is one right-aligned strip. Do not try to fake alignment
+there with padding; block widths are in pixels and the bar width is unknown.
+
+In the TUI each region is painted separately and then shifted into place, so
+click ranges must be recorded before padding and offset afterwards. Getting this
+wrong sends clicks to the wrong block, which no test will catch.
 
 ## Invariants
 

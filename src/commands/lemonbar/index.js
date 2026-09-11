@@ -1,5 +1,12 @@
 const status = require("../../status");
 const console = require("../../console");
+const regions = require("../../utils/regions");
+
+const MARKERS = {
+	left: "%{l}",
+	center: "%{c}",
+	right: "%{r}"
+};
 
 const DEFAULT_INTERVAL = 1000;
 
@@ -34,9 +41,15 @@ module.exports = function(args = []){
 	global.SILENT = true;
 
 	status.emitter.on("output", (output) => {
-		console.output(output.filter((block) => {
-			return block.full_text !== "";
-		}).map(paint).join(""));
+		const grouped = regions.group(output);
+
+		console.output(regions.order.filter((region) => {
+			return grouped[region].length > 0;
+		}).map((region) => {
+			return MARKERS[region] + grouped[region].filter((block) => {
+				return block.full_text !== "";
+			}).map(paint).join("");
+		}).join(""));
 	});
 
 	return status.init().then(() => {
