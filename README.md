@@ -127,6 +127,7 @@ Config lives in `~/.statusline.conf` and is written on first run.
 | `blocks[].color` | text colour, `#rgb` or `#rrggbb` |
 | `blocks[].backgroundColor` | background colour |
 | `blocks[].region` | `left`, `center` or `right`, default `left` |
+| `blocks[].interval` | how often to re-render, in milliseconds |
 | `blocks[].customOptions` | options for that block, listed below |
 | `middleware[].middleware` | middleware to run over the rendered output |
 | `middleware[].options` | options for that middleware |
@@ -143,6 +144,31 @@ The config is validated on load. A typo is reported by name and position:
 A broken config never takes the bar down with it. The problem is reported and
 the default config is used, so there is still a status line to read the error
 on.
+
+## Refreshing
+
+Blocks are not all polled on the same clock.
+
+`workspaces` and `window` subscribe to the compositor and redraw the moment
+something happens: Hyprland's event socket, or an i3 IPC subscription under Sway
+and i3. A workspace switch shows up as it happens rather than up to a second
+later.
+
+Every other block has its own `interval`, in milliseconds, and is served from
+its last value in between. This matters more than it sounds: asking pipewire for
+the volume and the GPU for its usage costs more than every other block put
+together, and neither changed because a window got focus. A redraw triggered by
+a workspace switch costs about 3ms rather than 35ms.
+
+```json
+{"name": "gpu", "interval": 5000}
+```
+
+Watched blocks default to a 10 second interval as a safety net, everything else
+to one second.
+
+The config file is watched too. Save it and the bar rebuilds itself; there is no
+need to restart the bar to try a change.
 
 ## Regions
 
@@ -315,6 +341,11 @@ module.exports = {
 `render` resolves with `{text}`. Resolve with an empty string to draw nothing at
 all. `block` is the entry from the config, so `block.customOptions` is where
 your options arrive.
+
+A block can also export `watch(block, status)` to drive its own redraws instead
+of waiting to be polled. Call `status.update(block)` when something changes, and
+return a function that stops watching. Updates are coalesced, so a burst of
+events costs one render.
 
 `onClick` receives the click event. `click.button` follows the i3bar numbering:
 1 left, 2 middle, 3 right, 4 scroll up, 5 scroll down. The status line is

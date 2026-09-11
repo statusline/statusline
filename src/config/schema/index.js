@@ -27,6 +27,9 @@ const SCHEMA = {
 			region: {
 				type: "enum",
 				values: ["left", "center", "right"]
+			},
+			interval: {
+				type: "number"
 			}
 		}
 	},

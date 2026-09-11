@@ -55,8 +55,63 @@ const DEFAULT_CONFIG = {
 	]
 };
 
+const WATCH_DEBOUNCE = 50;
+
 const config = {
 	default: DEFAULT_CONFIG,
+
+	/**
+	 * Calls back whenever the config file changes.
+	 *
+	 * The watch is re-established after a rename, because most editors save by
+	 * writing a new file and moving it over the old one; the watch would
+	 * otherwise be left holding a file that nothing writes to again.
+	 *
+	 * Changes are debounced, since one save often arrives as several events.
+	 *
+	 * @param {Function} onChange Called after the config file settles
+	 * @returns {Function} Call to stop watching
+	 */
+	watch: function(onChange){
+		let watcher = null;
+		let timer = null;
+
+		const start = function(){
+			try {
+				watcher = fs.watch(paths.configFile, handle);
+
+				watcher.unref();
+			} catch(_err) {
+				watcher = null;
+			}
+		};
+
+		const handle = function(eventType){
+			clearTimeout(timer);
+
+			timer = setTimeout(() => {
+				if(eventType === "rename"){
+					if(watcher){
+						watcher.close();
+					}
+
+					start();
+				}
+
+				onChange();
+			}, WATCH_DEBOUNCE);
+		};
+
+		start();
+
+		return function(){
+			clearTimeout(timer);
+
+			if(watcher){
+				watcher.close();
+			}
+		};
+	},
 
 	/**
 	 * Loads the config, writing the default one on first run.

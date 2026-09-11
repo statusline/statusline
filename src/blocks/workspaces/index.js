@@ -84,6 +84,19 @@ const workspaceAt = function(click, length){
  *   suffix - drawn after the focused workspace, defaults to "]"
  */
 module.exports = {
+	/**
+	 * Redraws on compositor events rather than waiting to be polled, so a
+	 * workspace change shows up as it happens.
+	 *
+	 * @param {Object} block Block config
+	 * @param {Object} status The status line
+	 * @returns {Function} Call to stop watching
+	 */
+	watch: function(block, status){
+		return compositor.subscribe(() => {
+			status.update(block);
+		});
+	},
 	render: function(block){
 		const customOptions = block.customOptions || {};
 		const prefix = customOptions.prefix || FOCUSED_PREFIX;

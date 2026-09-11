@@ -85,6 +85,19 @@ In the TUI each region is painted separately and then shifted into place, so
 click ranges must be recorded before padding and offset afterwards. Getting this
 wrong sends clicks to the wrong block, which no test will catch.
 
+**Rendering is not one clock.** A block may export `watch(block, status)` and
+call `status.update(block)` when it has something new; `workspaces` and `window`
+do this over the compositor event socket. Everything else has a per-block
+`interval` and is served from `status.cache` in between. `status.update()`
+coalesces a burst into one render.
+
+Keep this in mind when adding a block that shells out: its cost is paid by every
+redraw that finds it stale, including ones triggered by an unrelated event. Give
+an expensive block a longer interval rather than making the whole bar slow.
+
+The config file is watched, and a change calls `status.reload()`, which throws
+everything away and rebuilds. Block ids are reassigned on reload.
+
 ## Invariants
 
 **Nothing may take the bar down.** A block that throws renders as empty, a

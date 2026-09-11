@@ -7,6 +7,9 @@ const console = require("../console");
 const config = require("../config");
 const paths = require("../paths");
 
+const COALESCE_DELAY = 8;
+const DEFAULT_INTERVAL = 1000;
+const WATCHED_INTERVAL = 10000;
 const BLOCK_PREFIX = "statusline-block-";
 const MIDDLEWARE_PREFIX = "statusline-middleware-";
 
@@ -25,7 +28,12 @@ const loadInstalled = function(name){
 const status = {
 	blocks: [],
 	middleware: [],
+	watchers: [],
+	configWatcher: null,
+	cache: {},
+	dirty: {},
 	id: 0,
+	pending: null,
 
 	emitter: new EventEmitter(),
 
@@ -37,6 +45,42 @@ const status = {
 	 * @returns {Promise} Resolves once the status line is ready to render
 	 */
 	init: function(){
+		status.configWatcher = config.watch(() => {
+			status.reload();
+		});
+
+		return status.load();
+	},
+
+	/**
+	 * Rebuilds the status line from the config file.
+	 *
+	 * Everything is thrown away and built again rather than diffed: a config
+	 * reload is rare, and a block that was removed has to lose its subscriptions
+	 * and its cached value along with it.
+	 *
+	 * @returns {Promise} Resolves once the new config has been rendered
+	 */
+	reload: function(){
+		status.stopWatching();
+
+		status.blocks = [];
+		status.middleware = [];
+		status.cache = {};
+		status.dirty = {};
+		status.id = 0;
+
+		return status.load().then(() => {
+			return status.render();
+		});
+	},
+
+	/**
+	 * Reads the config and prepares every block and middleware it names.
+	 *
+	 * @returns {Promise} Resolves once the status line is ready to render
+	 */
+	load: function(){
 		return config.loadConfig().then((loaded) => {
 			loaded.blocks.forEach((block) => {
 				status.addBlock(block);
@@ -45,6 +89,8 @@ const status = {
 			(loaded.middleware || []).forEach((entry) => {
 				status.addMiddleware(entry);
 			});
+
+			status.startWatching();
 		});
 	},
 
@@ -64,8 +110,11 @@ const status = {
 			}
 		}
 
+		const watched = blocks[block.name].watch !== undefined;
+
 		status.blocks.push(Object.assign({}, block, {
-			id: status.id++
+			id: status.id++,
+			interval: block.interval || (watched ? WATCHED_INTERVAL : DEFAULT_INTERVAL)
 		}));
 	},
 
@@ -86,6 +135,73 @@ const status = {
 		}
 
 		status.middleware.push(entry);
+	},
+
+	/**
+	 * Subscribes to every block that can say when it has something new.
+	 *
+	 * A block exporting watch is asking to drive the redraw itself, rather than
+	 * waiting to be polled. That is what lets a workspace switch show up
+	 * immediately instead of up to an interval later.
+	 */
+	startWatching: function(){
+		status.watchers = status.blocks.map((block) => {
+			if(blocks[block.name].watch === undefined){
+				return null;
+			}
+
+			try {
+				return blocks[block.name].watch(block, status);
+			} catch(err) {
+				console.error("Block " + block.name + " failed to start watching: " + err.message);
+
+				return null;
+			}
+		}).filter(Boolean);
+	},
+
+	/**
+	 * Stops every subscription.
+	 */
+	stopWatching: function(){
+		status.watchers.forEach((stop) => {
+			stop();
+		});
+
+		status.watchers = [];
+	},
+
+	/**
+	 * Asks for a redraw because something changed.
+	 *
+	 * Several events often arrive together: switching workspace moves the focus
+	 * and changes the title too. Renders are coalesced into the next tick so one
+	 * user action costs one render rather than three.
+	 *
+	 * The timer is deliberately not unref'd. A coalesced render is work that has
+	 * been promised, and letting the process exit before it ran would drop it.
+	 *
+	 * @param {Object} [block] The block that has something new, if it was one
+	 * @returns {Promise} Resolves once the render this call belongs to is done
+	 */
+	update: function(block){
+		if(block){
+			status.dirty[block.id] = true;
+		}
+
+		if(status.pending){
+			return status.pending;
+		}
+
+		status.pending = new Promise((resolve) => {
+			setTimeout(() => {
+				status.pending = null;
+
+				resolve(status.render());
+			}, COALESCE_DELAY);
+		});
+
+		return status.pending;
 	},
 
 	/**
@@ -125,6 +241,13 @@ const status = {
 	/**
 	 * Renders one block into the object an i3bar protocol consumer expects.
 	 *
+	 * A block is only asked for a new value once its own interval has passed, or
+	 * when it said it had something new. Everything else is served from the last
+	 * value it gave. Without this, a redraw triggered by a workspace switch would
+	 * also pay for every slow block on the bar: asking pipewire for the volume
+	 * and the GPU for its usage costs more than everything else put together, and
+	 * neither of them changed because a window got focus.
+	 *
 	 * A block that throws is rendered as empty rather than being allowed to take
 	 * the whole bar down.
 	 *
@@ -132,6 +255,16 @@ const status = {
 	 * @returns {Promise<Object>} Rendered block
 	 */
 	renderBlock: function(block){
+		const cached = status.cache[block.id];
+
+		const fresh = cached !== undefined && Date.now() - cached.at < block.interval;
+
+		if(fresh && status.dirty[block.id] !== true){
+			return Promise.resolve(cached.output);
+		}
+
+		delete status.dirty[block.id];
+
 		return Promise.resolve().then(() => {
 			return blocks[block.name].render(block, status);
 		}).catch((err) => {
@@ -141,7 +274,7 @@ const status = {
 				text: ""
 			};
 		}).then((result) => {
-			return {
+			const output = {
 				name: "block" + block.id,
 				instance: block.name,
 				markup: "none",
@@ -152,6 +285,13 @@ const status = {
 				separator: false,
 				separator_block_width: 0
 			};
+
+			status.cache[block.id] = {
+				output: output,
+				at: Date.now()
+			};
+
+			return output;
 		});
 	},
 
