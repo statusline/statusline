@@ -36,7 +36,6 @@
   "homepage": "https://github.com/statusline/statusline#readme",
   "dependencies": {
     "log-symbols": "^2.0.0",
-    "npm-programmatic": "^0.0.8",
     "statusline-block-time": "^1.0.1"
   },
   "devDependencies": {

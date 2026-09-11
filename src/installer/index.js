@@ -1,36 +1,49 @@
-const npm = require("npm-programmatic");
 const fs = require("fs");
 const path = require("path");
 
 const paths = require("../paths");
+const exec = require("../utils/exec");
 const console = require("../console");
 
 const PREFIX = "statusline-";
-
-if(!fs.existsSync(paths.modulePath)){
-	fs.mkdirSync(paths.modulePath);
-
-	fs.writeFileSync(path.join(paths.modulePath, "package.json"), "{}");
-}
+const TIMEOUT = 120000;
 
 /**
- * Runs an npm operation against the directory blocks are installed into.
+ * Makes sure the directory blocks are installed into exists.
+ */
+const prepare = function(){
+	if(fs.existsSync(paths.modulePath)){
+		return;
+	}
+
+	fs.mkdirSync(paths.modulePath);
+
+	fs.writeFileSync(path.join(paths.modulePath, "package.json"), "{}\n");
+};
+
+/**
+ * Runs an npm command against the directory blocks are installed into.
  *
- * @param {Function} operation npm-programmatic function to call
+ * npm is run directly rather than through a shell, so a package name cannot
+ * carry shell syntax into the command.
+ *
+ * @param {string} operation npm subcommand, "install" or "uninstall"
  * @param {string[]} names Package names, without the statusline- prefix
  * @param {string} present Verb used while working, e.g. "Installing"
  * @param {string} past Verb used when done, e.g. "Installed"
  * @returns {Promise} Resolves once every package has been handled
  */
 const each = function(operation, names, present, past){
+	prepare();
+
 	const promises = names.map((name) => {
 		const packageName = PREFIX + name;
 
 		console.log(present + " " + packageName + "...");
 
-		return operation([packageName], {
+		return exec.run("npm", [operation, packageName, "--save", "--prefix", paths.modulePath], {
 			cwd: paths.modulePath,
-			save: true
+			timeout: TIMEOUT
 		}).then(() => {
 			console.success(past + " " + packageName);
 		}).catch((err) => {
@@ -51,7 +64,7 @@ const installer = {
 	 * @returns {Promise} Resolves once every package is installed
 	 */
 	install: function(names){
-		return each(npm.install, names, "Installing", "Installed").catch(() => {
+		return each("install", names, "Installing", "Installed").catch(() => {
 			process.exitCode = 1;
 		});
 	},
@@ -63,7 +76,7 @@ const installer = {
 	 * @returns {Promise} Resolves once every package is removed
 	 */
 	uninstall: function(names){
-		return each(npm.uninstall, names, "Uninstalling", "Uninstalled").catch(() => {
+		return each("uninstall", names, "Uninstalling", "Uninstalled").catch(() => {
 			process.exitCode = 1;
 		});
 	}
