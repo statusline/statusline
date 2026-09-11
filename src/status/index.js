@@ -337,6 +337,7 @@ const status = {
 				instance: block.name,
 				markup: result.markup || "none",
 				full_text: result.text,
+				tooltip: result.tooltip,
 				color: block.color,
 				background: block.backgroundColor,
 				region: block.region,

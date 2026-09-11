@@ -3,6 +3,7 @@ const fs = require("fs");
 
 const homeDir = process.env["HOME"];
 const configHome = process.env["XDG_CONFIG_HOME"] || path.join(homeDir, ".config");
+const stateHome = process.env["XDG_STATE_HOME"] || path.join(homeDir, ".local", "state");
 
 const DEFAULT_CONFIG = path.join(homeDir, ".statusline.conf");
 const CONFIG_DIRECTORY = path.join(configHome, "statusline");
@@ -13,6 +14,7 @@ const paths = {
 	defaultConfigFile: DEFAULT_CONFIG,
 	configDirectory: CONFIG_DIRECTORY,
 	logFile: path.join(homeDir, ".statusline.log"),
+	stateFile: path.join(stateHome, "statusline", "state.json"),
 	modulePath: path.join(homeDir, ".statusline_packages"),
 
 	/**

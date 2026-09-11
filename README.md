@@ -233,6 +233,18 @@ So under waybar:
 Each module is a process, so this trades memory for clickability. Under i3bar or
 swaybar one process does everything and every click works, with no hooks.
 
+## State
+
+Some blocks remember something between renders: the clock remembers whether it
+is showing the time or the date. That cannot live in a variable, because a bar
+without a click protocol runs `statusline click` as a separate process which
+sets the value and exits, while the bar is a different process that has to
+notice. It goes in `~/.local/state/statusline/state.json`, which is watched, so
+a toggle from anywhere redraws the bar immediately.
+
+Blocks read and write it through `src/services/state`. Keep it to small things;
+it is state, not a cache and not a config.
+
 ## Named configs
 
 The default config is `~/.statusline.conf`. Named ones live in
@@ -268,6 +280,7 @@ All of these are built in. Anything else is installed from npm.
 | `memory` | memory in use | |
 | `load` | load average | |
 | `battery` | charge, with an icon that tracks the level | |
+| `clock` | the time, or the date when clicked | click to swap time and date |
 | `date` | the date, spelled out | |
 | `powerline` | a single separator glyph | |
 
@@ -314,6 +327,10 @@ Set these under `customOptions`.
 | `load` | `perCore` | divide by core count, so 1.00 means fully loaded |
 | `battery` | `battery` | battery name, autodetected otherwise |
 | `battery` | `remaining` | append estimated time to empty or full |
+| `clock` | `format`, `dateFormat` | `Intl.DateTimeFormat` options for each mode |
+| `clock` | `calendar` | set to false to leave the hover calendar off |
+| `clock` | `icon` | set to false to show the time on its own |
+| `media` | `showPlayer` | prefix the text with the player's name |
 | `date` | `locale` | BCP 47 locale tag |
 | `date` | `format` | `Intl.DateTimeFormat` options |
 
@@ -386,6 +403,9 @@ A block can also export `watch(block, status)` to drive its own redraws instead
 of waiting to be polled. Call `status.update(block)` when something changes, and
 return a function that stops watching. Updates are coalesced, so a burst of
 events costs one render.
+
+`render` may also resolve with a `tooltip`, as pango markup, which bars that
+draw tooltips will show on hover. The clock uses it for its calendar.
 
 `onClick` receives the click event. `click.button` follows the i3bar numbering:
 1 left, 2 middle, 3 right, 4 scroll up, 5 scroll down. The status line is

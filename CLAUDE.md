@@ -110,6 +110,16 @@ text. Outputs that cannot render markup strip it, and every width must be
 measured with `markup.length`, never `String.length`, or a block carrying tags
 is laid out as if the tags were visible. Anything from outside is escaped first.
 
+**Cross process state.** A block toggled by a click cannot keep that toggle in
+a variable: under waybar the click is a separate short lived process. Such state
+goes in `src/services/state`, which persists to
+`~/.local/state/statusline/state.json` and watches it, so the bar redraws when
+another process changes it. The clock's time/date toggle works this way.
+
+**Never let playerctl choose the player.** Its default pick is unrelated to what
+is playing: a paused Telegram message beats Spotify mid track. Ask
+`--all-players` and choose, preferring Playing over Paused.
+
 ## Invariants
 
 **Nothing may take the bar down.** A block that throws renders as empty, a

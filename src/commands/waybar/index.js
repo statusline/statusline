@@ -34,6 +34,32 @@ const paint = function(block){
 };
 
 /**
+ * Builds the tooltip for a module.
+ *
+ * A block that supplies its own tooltip has something worth showing, such as
+ * the clock's calendar, so those are used on their own. Otherwise the module
+ * falls back to listing what it is drawing.
+ *
+ * @param {Object[]} blocks Visible rendered blocks
+ * @returns {string} Tooltip text, as pango markup
+ */
+const tooltip = function(blocks){
+	const supplied = blocks.filter((block) => {
+		return block.tooltip;
+	});
+
+	if(supplied.length > 0){
+		return supplied.map((block) => {
+			return block.tooltip;
+		}).join("\n");
+	}
+
+	return blocks.map((block) => {
+		return block.instance + ": " + markup.strip(block.full_text).trim();
+	}).join("\n");
+};
+
+/**
  * Renders the status line as a waybar custom module.
  *
  * waybar reads one JSON object per line from a long running process, so this
@@ -86,9 +112,7 @@ module.exports = function(args = []){
 
 				return paint(block);
 			}).join(""),
-			tooltip: visible.map((block) => {
-				return block.instance + ": " + markup.strip(block.full_text).trim();
-			}).join("\n"),
+			tooltip: tooltip(visible),
 			class: "statusline"
 		}));
 	});
