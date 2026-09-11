@@ -43,5 +43,9 @@
   },
   "engines": {
     "node": ">=12"
-  }
+  },
+  "files": [
+    "index.js",
+    "src"
+  ]
 }
