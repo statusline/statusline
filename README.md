@@ -274,7 +274,7 @@ All of these are built in. Anything else is installed from npm.
 | `brightness` | screen backlight | scroll to change |
 | `network` | wireless network and signal, or wired interface | |
 | `ip` | address of the interface reaching the network | |
-| `temperature` | CPU temperature | |
+| `temperature` | CPU temperature, coloured by how hot it is | |
 | `cpu` | CPU usage | |
 | `gpu` | GPU usage, VRAM and temperature | |
 | `memory` | memory in use | |
@@ -318,7 +318,9 @@ Set these under `customOptions`.
 | `ip` | `all` | list every physical interface |
 | `temperature` | `path` | hwmon directory, autodetected otherwise |
 | `temperature` | `input` | input file, default `temp1_input` |
-| `temperature` | `critical` | threshold for the hottest icon, default 80 |
+| `temperature` | `critical` | threshold for the hottest icon and colour, default 80 |
+| `temperature` | `warning` | threshold at which the colour changes, default 60 |
+| `temperature` | `colors` | `{normal, warning, critical}` hex colours, or false for none |
 | `gpu` | `card` | card index for nvidia-smi, or a name like `card0` for AMD |
 | `gpu` | `memory` | append VRAM in use |
 | `gpu` | `temperature` | append the card temperature |
